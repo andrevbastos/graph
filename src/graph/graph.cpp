@@ -1,9 +1,45 @@
 #include "graph/graph.hpp"
 
+Mesh3D* makeLine(glm::vec3 origin, glm::vec3 end)
+{
+    float d = 0.01f;
+    return new Mesh3D({
+            Vertex(origin.x + d, origin.y + d, origin.z, 1.0f, 0.0f, 0.0f, 1.0f),
+            Vertex(origin.x + d, origin.y - d, origin.z, 1.0f, 0.0f, 0.0f, 1.0f),
+            Vertex(origin.x - d, origin.y + d, origin.z, 1.0f, 0.0f, 0.0f, 1.0f),
+            Vertex(origin.x - d, origin.y - d, origin.z, 1.0f, 0.0f, 0.0f, 1.0f),
+            Vertex(end.x + d, end.y + d, end.z, 1.0f, 0.0f, 0.0f, 1.0f), 
+            Vertex(end.x + d, end.y - d, end.z, 1.0f, 0.0f, 0.0f, 1.0f), 
+            Vertex(end.x - d, end.y + d, end.z, 1.0f, 0.0f, 0.0f, 1.0f), 
+            Vertex(end.x - d, end.y - d, end.z, 1.0f, 0.0f, 0.0f, 1.0f)
+        }, 
+        {
+            0, 1, 2,
+            2, 1, 3,
+            4, 6, 5,
+            6, 7, 5,
+            0, 2, 4,
+            4, 2, 6,
+            1, 3, 5,
+            5, 3, 7,
+            0, 4, 1,
+            1, 4, 5,
+            2, 3, 6,
+            6, 3, 7
+        }, 
+        IFCG::shader.id
+    );
+}
+
 Node* Graph::newVertex(int value) {
     vertices.push_back(std::make_unique<Node>(value));
     return vertices.back().get();
 };
+
+Node* Graph::newVertex(int value, const Vertex& glVertex) {
+    vertices.push_back(std::make_unique<Node>(value, glVertex.x, glVertex.y, glVertex.z));
+    return vertices.back().get();
+}
 
 Node* Graph::getVertex(int i) {
     if (i < vertices.size()) {
@@ -74,8 +110,13 @@ Graph Graph::makeSubGraph(std::vector<int> targetVertices, std::vector<int> targ
     Graph subgraph;
 
     if (targetVertices.size() <= vertices.size()) {
-        for (int v : targetVertices) {
-            subgraph.newVertex(vertices[v]->getValue());
+        for (int v_index : targetVertices) {
+            Node* originalNode = vertices[v_index].get();
+            
+            int originalValue = originalNode->getValue();
+            Vertex originalGLVertex = originalNode->getGLVertex();
+
+            subgraph.newVertex(originalValue, originalGLVertex);
         }
     }
 
@@ -102,6 +143,10 @@ Graph Graph::makeSubGraph(std::vector<int> targetVertices, std::vector<int> targ
         }
     }
     return subgraph;
+}
+
+void Graph::print() const {
+
 }
 
 void Graph::fastPrint() const {
@@ -140,5 +185,28 @@ void Graph::fastPrint() const {
         std::cout << degreeSeq[i];
         if (i < degreeSeq.size() - 1) std::cout << ", ";
         else std::cout << std::endl;;
+    }    
+}
+
+void Graph::addToRenderQueue() {
+    Sphere3D* sphere = new Sphere3D(10, IFCG::shader.id);
+    sphere->scale(0.1f, 0.1f, 0.1f);
+
+    mesh = new MeshTree3D({});
+    mesh->translate(0.0f, 0.0f, -3.0f);
+    for (const auto& v : vertices) {
+        Vertex glVertex = v->getGLVertex();
+        Mesh3D* vert = sphere->duplicate();
+        vert->translate(glVertex.x * 10.f, glVertex.y * 10.f, glVertex.z * 10.f);
+        mesh->addSubMesh(vert);
     }
+    for (const auto& e : edges) {
+        Node* n1 = e->getNode1();
+        Vertex v1 = n1->getGLVertex();
+        Node* n2 = e->getNode2();
+        Vertex v2 = n2->getGLVertex();
+        mesh->addSubMesh(makeLine(glm::vec3(v1.x, v1.y, v1.z), glm::vec3(v2.x, v2.y, v2.z)));
+    }
+
+    IFCG::addMesh(mesh);
 }

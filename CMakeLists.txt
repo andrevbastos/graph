@@ -1,6 +1,6 @@
 # Versão mínima do CMake e nome do projeto
 cmake_minimum_required(VERSION 3.15)
-project(ifcg_engine LANGUAGES C CXX)
+project(graph LANGUAGES C CXX)
 
 # Configurações do CMake
 set(CMAKE_CXX_STANDARD 17)
@@ -109,39 +109,39 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(APP_SOURCE_DIR ${CMAKE_SOURCE_DIR}/tests)
 set(APP_MAIN_SOURCE_FILES "${APP_SOURCE_DIR}/main.cpp")
 
-add_executable(ifcg_app ${APP_MAIN_SOURCE_FILES})
+add_executable(graph_app ${APP_MAIN_SOURCE_FILES})
 
 # Diretórios de Include para a Aplicação (para encontrar os headers da ifcg)
 target_include_directories(
-    ifcg_app
+    graph_app
     PRIVATE
         "${CMAKE_SOURCE_DIR}/include"
 )
 
 # Bibliotecas para linkar com a Aplicação
 target_link_libraries(
-    ifcg_app
+    graph_app
     PRIVATE
         ifcg 
 )
 
 # Comando Pós-Build para copiar DLLs no Windows (se ifcg for SHARED)
 if (WIN32) #
-    add_custom_command(TARGET ifcg_app POST_BUILD
+    add_custom_command(TARGET graph_app POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        $<TARGET_RUNTIME_DLLS:ifcg_app>
-        $<TARGET_FILE_DIR:ifcg_app>
+        $<TARGET_RUNTIME_DLLS:graph_app>
+        $<TARGET_FILE_DIR:graph_app>
         COMMAND_EXPAND_LISTS
         COMMENT "Copiando DLLs necessárias para o diretório do executável..."
     )
 endif ()
 
-add_custom_command(TARGET ifcg_app POST_BUILD
+add_custom_command(TARGET graph_app POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_SOURCE_DIR}/resources $<TARGET_FILE_DIR:ifcg_app>/resources
+    ${CMAKE_SOURCE_DIR}/resources $<TARGET_FILE_DIR:graph_app>/resources
 )
 
 # Mensagem final para o usuário
 message(STATUS "Configuração do CMake concluída. Para construir, use 'make' no diretório de build.")
-message(STATUS "Executável estará em: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ifcg_app")
+message(STATUS "Executável estará em: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/graph_app")
 message(STATUS "Biblioteca ifcg estará em: ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")

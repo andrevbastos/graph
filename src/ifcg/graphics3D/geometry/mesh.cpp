@@ -78,9 +78,11 @@ namespace mesh3D
 
     void Mesh3D::scale(float sX, float sY, float sZ) 
     {
-		model = glm::scale(model, glm::vec3(sX, sY, sZ));
-    };
+		glm::mat4 modelSave = model;
+    	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(sX, sY, sZ));	
 
+        model = modelSave * scale;
+    };
 
 	void Mesh3D::rotate(float angle, float rX, float rY, float rZ)
 	{

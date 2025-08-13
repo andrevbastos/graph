@@ -1,23 +1,36 @@
 #include "graph/graph.hpp"
 
 int main() {
+    IFCG::init();
+    IFCG::createWindow(800, 600);
+    
+    IFCG::setup3D();
+    
     Graph g1;
+    
+    Node* n1 = g1.newVertex(0, Vertex(1.0f, 1.0f));
+    Node* n2 = g1.newVertex(1, Vertex(-1.0f, 1.0f));
+    Node* n3 = g1.newVertex(2, Vertex(1.0f, -1.0f));
+    Node* n4 = g1.newVertex(3, Vertex(-1.0f, -1.0f));
+    
+    Edge* e1 = g1.newEdge(0, 1);
+    Edge* e2 = g1.newEdge(0, 2);
+    Edge* e3 = g1.newEdge(0, 3);
+    Edge* e4 = g1.newEdge(1, 2);
+    Edge* e5 = g1.newEdge(1, 3);
+    Edge* e6 = g1.newEdge(2, 3);
+    
+    Graph g2 = g1.makeSubGraph({0, 1, 2, 3}, {0, 1, 2});
 
-    Node* n1 = g1.newVertex(1);
-    Node* n2 = g1.newVertex(2);
-    Node* n3 = g1.newVertex(3);
-    Node* n4 = g1.newVertex(4);
+    g1.addToRenderQueue();
+    g2.addToRenderQueue();
 
-    Edge* e1 = g1.newEdge(0, 2);
-    Edge* e2 = g1.newEdge(1, 3);
-    Edge* e3 = g1.newEdge(2, 3);
+    g1.getMesh()->translate(0.0f, 0.0f, -3.0f);
+    g2.getMesh()->translate(0.0f, 3.0f, -3.0f);
 
-    std::cout << "--- G1 ---" << std::endl;
-    g1.fastPrint();
+    IFCG::setFramesPerSecond(60);
+    IFCG::loop([&]{});
 
-    Graph g2 = g1.makeSubGraph({0, 1, 2}, {0});
-    std::cout << "\n--- G2 ---" << std::endl;
-    g2.fastPrint();
-
+    IFCG::terminate();
     return 0;
 }
