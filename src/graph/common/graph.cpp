@@ -3,99 +3,134 @@ using namespace abstract;
 
 Node* Graph::newVertex(Vertex glVertex)
 {
-    vertices.push_back(std::make_unique<Node>(vertices.size(), glVertex));
-    Node* newVertex = vertices.back().get();
+    int newID = nextNodeId++;
+    auto newNode = std::make_unique<Node>(newID, glVertex);
+    Node* nodePtr = newNode.get();
+    vertices.emplace(newID, std::move(newNode));
+    std::cout << "New vertex: " << newID << std::endl;
+    
     if (mesh)
-        vertexToRenderQueue(newVertex);
-    return newVertex;
+        vertexToRenderQueue(nodePtr);
+    return nodePtr;
 };
 
-Edge* Graph::newEdge(int v1, int v2)
+Edge* Graph::newEdge(int v1_ID, int v2_ID)
 {
-    return newEdge(getVertex(v1), getVertex(v2));
+    return newEdge(getVertex(v1_ID), getVertex(v2_ID));
 };
 
 Edge* Graph::newEdge(Node* v1, Node* v2)
 {
-    auto it1 = std::find_if(vertices.begin(), vertices.end(), 
-        [&v1](const std::unique_ptr<Node>& ptr) {
-            return ptr.get() == v1;
-        });
+    if (!v1 || !v2) return nullptr;
 
-    auto it2 = std::find_if(vertices.begin(), vertices.end(), 
-        [&v2](const std::unique_ptr<Node>& ptr) {
-            return ptr.get() == v2;
-        });
-
-    if (it1 == vertices.end() || it2 == vertices.end())
+    if (vertices.find(v1->getId()) == vertices.end() || vertices.find(v2->getId()) == vertices.end())
         return nullptr;
 
-    edges.push_back(std::make_unique<Edge>(v1, v2));
-    Edge* newEdge = edges.back().get();
+    int newId = nextEdgeId++;
+    auto newEdgeUniquePtr = std::make_unique<Edge>(newId, v1, v2);
+    Edge* newEdgePtr = newEdgeUniquePtr.get();
+    
+    edges.emplace(newId, std::move(newEdgeUniquePtr));
+
+    v1->linkTo(v2, newEdgePtr);
+    v2->linkTo(v1, newEdgePtr);
+
     if (mesh)
-        edgeToRenderQueue(newEdge);
-    return newEdge;
+        edgeToRenderQueue(newEdgePtr);
+        
+    return newEdgePtr;
 };
-
-void Graph::removeVertex(Node* n)
-{
-    edges.erase(
-        std::remove_if(edges.begin(), edges.end(),
-                       [&](const std::unique_ptr<Edge>& edge) {
-                           return edge->getNode1() == n || edge->getNode2() == n;
-                       }),
-        edges.end());
-
-    vertices.erase(
-        std::remove_if(vertices.begin(), vertices.end(),
-                       [&](const std::unique_ptr<Node>& vertex) {
-                           return vertex.get() == n;
-                       }),
-        vertices.end());
-}
 
 void Graph::removeVertex(int n)
 {
-    if (n < 0 || n >= vertices.size())
-        return;
-
     removeVertex(getVertex(n));
 }
 
+void Graph::removeVertex(Node* n)
+{
+    if (!n || vertices.find(n->getId()) == vertices.end())
+        return;
+
+    std::vector<int> edgesToRemove;
+    for (const auto& pair : edges) {
+        if (pair.second->getNode1() == n || pair.second->getNode2() == n)
+            edgesToRemove.push_back(pair.first);
+    }
+
+    for (int edgeID : edgesToRemove) {
+        edges.erase(edgeID);
+    }
+
+    vertices.erase(n->getId());
+}
+
+void Graph::removeEdge(int eId)
+{
+    edges.erase(eId);
+}
+
+void Graph::removeEdge(Edge* e)
+{
+    if (e) {
+        removeEdge(e->getId());
+    }
+}
+
+Node* Graph::getVertex(int v_ID) const
+{
+    auto it = vertices.find(v_ID);
+    return (it != vertices.end()) ? it->second.get() : nullptr;    
+};
+
+Edge* Graph::getEdge(int e_ID) const
+{
+    auto it = edges.find(e_ID);
+    return (it != edges.end()) ? it->second.get() : nullptr;
+};
+
+Node* Graph::getOpposite(int v_ID, int e_ID) const
+{
+    return getOpposite(getVertex(v_ID), getEdge(e_ID));
+};
+
+Node* Graph::getOpposite(Node* v, Edge* e) const
+{
+    if (v != e->getNode1()) {
+        if (v != e->getNode2()) return nullptr;
+        else return e->getNode2();
+    } else return e->getNode1();
+};
+
 std::vector<Node*> Graph::getVertices() const
 {
-    std::vector<Node*> verticesCopy;
-    for (const auto &vertex : vertices)
-    {
-        verticesCopy.push_back(vertex.get());
-    }
-    return verticesCopy;
+    std::vector<Node*> result;
+    result.reserve(vertices.size());
+    for (const auto &pair : vertices)
+        result.push_back(pair.second.get());
+    
+    return result;
 };
 
 std::vector<Edge*> Graph::getEdges() const
 {
-    std::vector<Edge*> edgesCopy;
-    for (const auto &edge : edges)
-    {
-        edgesCopy.push_back(edge.get());
-    }
-    return edgesCopy;
+    std::vector<Edge*> result;
+    result.reserve(edges.size());
+    for (const auto &pair : edges)
+        result.push_back(pair.second.get());
+    
+    return result;
 };
 
-Node* Graph::getVertex(int i)
+std::vector<Node*> Graph::getNodesFromEdge(int e_ID) const
 {
-    if (i < vertices.size())
-        return vertices.at(i).get();
-
-    return nullptr;
+    return getNodesFromEdge(getEdge(e_ID));
 };
 
-Edge* Graph::getEdge(int i)
+std::vector<Node*> Graph::getNodesFromEdge(Edge* e) const
 {
-    if (i < edges.size())
-        return edges.at(i).get();
-
-    return nullptr;
+    if (!e)
+        return {};
+    return {e->getNode1(), e->getNode2()};
 };
 
 int Graph::getOrder() const
@@ -115,80 +150,6 @@ float Graph::getDensity() const
     return (n > 0) ? (m * 2) / (n * (n - 1)) : 0.0f;
 };
 
-Graph* Graph::makeSubGraph(const std::vector<int>& targetVertices, const std::vector<int>& targetEdges) const
-{
-    Graph* subgraph;
-
-    if (targetVertices.size() <= vertices.size())
-    {
-        for (int v_index : targetVertices)
-        {
-            if (v_index < 0 || v_index >= vertices.size())
-                continue;
-
-            Node* originalNode = vertices[v_index].get();
-
-            Vertex originalGLVertex = originalNode->getGLVertex();
-
-            subgraph->newVertex(originalGLVertex);
-        }
-    }
-
-    std::vector<Node* > subVertices = subgraph->getVertices();
-    if (targetEdges.size() <= edges.size())
-    {
-        for (int e_index : targetEdges)
-        {
-            if (e_index < 0 || e_index >= edges.size())
-                continue;
-
-            Node* n1 = edges[e_index]->getNode1();
-            Node* n2 = edges[e_index]->getNode2();
-
-            int n1Index = -1, n2Index = -1;
-
-            for (int i = 0; i < subVertices.size(); i++)
-            {
-                if (subVertices[i]->getValue() == n1->getValue())
-                {
-                    n1Index = i;
-                }
-                if (subVertices[i]->getValue() == n2->getValue())
-                {
-                    n2Index = i;
-                }
-            }
-
-            if (n1Index != -1 && n2Index != -1)
-            {
-                subgraph->newEdge(n1Index, n2Index);
-            }
-        }
-    }
-    return subgraph;
-};
-
-void Graph::print() const
-{
-    fastPrint();
-    std::cout << std::fixed << std::setprecision(2);
-    std::cout << "\nGraph statistics:" << std::endl;
-    std::cout << "\tOrder: " << getOrder() << std::endl;
-    std::cout << "\tSize: " << getSize() << std::endl;
-    std::cout << "\tDensity: " << getDensity() << std::endl;
-    std::cout << "\tDegree Sequence: ";
-    std::vector<int> degreeSeq = getDegreeSequence();
-    for (int i = 0; i < degreeSeq.size(); i++)
-    {
-        std::cout << degreeSeq[i];
-        if (i < degreeSeq.size() - 1)
-            std::cout << ", ";
-        else
-            std::cout << std::endl;
-        ;
-    }
-};
-
 void Graph::fastPrint() const
 {
     if (getOrder() > 0)
@@ -196,11 +157,11 @@ void Graph::fastPrint() const
         std::cout << "Vertices in graph:" << std::endl;
         for (auto &v : vertices)
         {
-            std::cout << "\t" << v->getValue() << " -> ";
+            std::cout << "\t" << v.first << " -> ";
             std::cout << "Neighbors: ";
-            for (auto &n : v->getNeighbors())
+            for (auto &n : v.second.get()->getNeighbors())
             {
-                std::cout << n->getValue() << " ";
+                std::cout << n->getId() << " ";
             }
             std::cout << std::endl;
         }
@@ -216,13 +177,23 @@ void Graph::fastPrint() const
     {
         for (auto &e : edges)
         {
-            std::cout << "\t(" << e->getNode1()->getValue() << ", " << e->getNode2()->getValue() << ")" << std::endl;
+            std::cout << "\t(" << e.second->getNode1()->getId() << ", " << e.second->getNode2()->getId() << ")" << std::endl;
         }
     }
     else
     {
         std::cout << "∅" << std::endl;
     }
+};
+
+void Graph::print() const
+{
+    fastPrint();
+    std::cout << std::fixed << std::setprecision(2);
+    std::cout << "\nGraph statistics:" << std::endl;
+    std::cout << "\tOrder: " << getOrder() << std::endl;
+    std::cout << "\tSize: " << getSize() << std::endl;
+    std::cout << "\tDensity: " << getDensity() << std::endl;
 };
 
 void Graph::addToRenderQueue()
@@ -233,15 +204,21 @@ void Graph::addToRenderQueue()
     mesh->translate(0.0f, 0.0f, -3.0f);
     for (const auto &v : vertices)
     {
-        vertexToRenderQueue(v.get());
+        vertexToRenderQueue(v.second.get());
     }
     for (const auto &e : edges)
     {
-        edgeToRenderQueue(e.get());
+        edgeToRenderQueue(e.second.get());
     }
 
     IFCG::addMesh(mesh);
 };
+
+MeshTree3D* Graph::getMesh()
+{
+    return mesh;
+};
+
 
 Mesh3D *Graph::vertexToRenderQueue(Node* v)
 {

@@ -1,19 +1,25 @@
-#include "graph/node.hpp"
+#ifndef EDGE_HPP
+#define EDGE_HPP
+
+#include "ifcg/graphics3D/geometry/mesh.hpp"
+
+class Node;
 
 class Edge {
 public:
-    Edge(Node* n1, Node* n2) : node1(n1), node2(n2) {
-        n1->linkTo(n2);
-        n2->linkTo(n1);
-    };
+    Edge(int id, Node* n1, Node* n2)
+        : _id(id), _nodes(n1, n2), _mesh(nullptr) {};
 
-    Node* getNode1() const { return node1; };
-    Node* getNode2() const { return node2; };
+    int getId() const { return _id; };
+    Node* getNode1() const { return _nodes.first;};
+    Node* getNode2() const { return _nodes.second;};
 
-    void setMesh(Mesh3D* m) { mesh = m; };
+    void setMesh(Mesh3D* m) { _mesh = m;};
 
 private:
-    Node* node1;
-    Node* node2;
-    Mesh3D* mesh = nullptr;
+    int _id;
+    std::pair<Node*, Node*> _nodes;
+    Mesh3D* _mesh;
 };
+
+#endif // EDGE_HPP
