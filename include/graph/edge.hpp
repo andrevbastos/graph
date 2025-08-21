@@ -1,4 +1,4 @@
-#include "node.hpp"
+#include "graph/node.hpp"
 
 class Edge {
 public:
@@ -10,7 +10,10 @@ public:
     Node* getNode1() const { return node1; };
     Node* getNode2() const { return node2; };
 
+    void setMesh(Mesh3D* m) { mesh = m; };
+
 private:
     Node* node1;
     Node* node2;
+    Mesh3D* mesh = nullptr;
 };

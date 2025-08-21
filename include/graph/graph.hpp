@@ -10,10 +10,10 @@
 #include "ifcg/graphics3D/geometry/meshTree.hpp"
 #include "ifcg/graphics3D/geometry/sphere.hpp"
 
-class Graph {
+class Graph
+{
 public:
-    Node* newVertex(int value);
-    Node* newVertex(int value, const Vertex& glVertex);
+    Node* newVertex(int value, Vertex glVertex = Vertex(0.0f, 0.0f));
     Node* getVertex(int i);
     std::vector<Node*> getVertices();
 
@@ -33,10 +33,14 @@ public:
     void fastPrint() const;
     void addToRenderQueue();
 
-    MeshTree3D* getMesh() const { return mesh; };
+    MeshTree3D *getMesh() const { return mesh; };
 
 private:
+    Mesh3D* vertexToRenderQueue(Node* v);
+    Mesh3D* edgeToRenderQueue(Edge* e);
+
     std::vector<std::unique_ptr<Node>> vertices;
     std::vector<std::unique_ptr<Edge>> edges;
-    MeshTree3D* mesh = nullptr;
+    MeshTree3D *mesh = nullptr;
+    Sphere3D *sphere = new Sphere3D(10, IFCG::shader.id);
 };
