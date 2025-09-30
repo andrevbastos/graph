@@ -1,0 +1,19 @@
+{
+  "directed": true,
+  "weighted": false,
+  "nodes": [
+    { "id": 0, "label": "A" }, { "id": 1, "label": "B" }, { "id": 2, "label": "C" },
+    { "id": 3, "label": "D" }, { "id": 4, "label": "E" }, { "id": 5, "label": "F" },
+    { "id": 6, "label": "G" }, { "id": 7, "label": "H" }, { "id": 8, "label": "I" },
+    { "id": 9, "label": "J" }, { "id": 10, "label": "K" }, { "id": 11, "label": "L" }
+  ],
+  "edges": [
+    { "source": 0, "target": 1, "weight": 1.0 }, { "source": 1, "target": 2, "weight": 1.0 },
+    { "source": 2, "target": 0, "weight": 1.0 }, { "source": 1, "target": 3, "weight": 1.0 },
+    { "source": 3, "target": 4, "weight": 1.0 }, { "source": 4, "target": 5, "weight": 1.0 },
+    { "source": 5, "target": 6, "weight": 1.0 }, { "source": 6, "target": 3, "weight": 1.0 },
+    { "source": 7, "target": 8, "weight": 1.0 }, { "source": 8, "target": 9, "weight": 1.0 },
+    { "source": 9, "target": 10, "weight": 1.0 }, { "source": 10, "target": 11, "weight": 1.0 },
+    { "source": 11, "target": 7, "weight": 1.0 }
+  ]
+}

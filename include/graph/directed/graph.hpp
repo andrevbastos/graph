@@ -6,15 +6,14 @@ namespace directed {
     class Graph : public common::Graph
     {
     public:
-        virtual common::Node* newVertex();
-        virtual common::Edge* newEdge(int v1_ID, int v2_ID);
-        virtual common::Edge* newEdge(common::Node* v1_ID, common::Node* v2_ID);
+        common::Node* newVertex(std::string label = "") override;
+        common::Edge* newEdge(int v1_ID, int v2_ID);
+        common::Edge* newEdge(common::Node* v1, common::Node* v2);
 
-        virtual void removeVertex(int v_ID) override;
-        virtual void removeVertex(common::Node* v) override;
-        virtual void removeEdge(int e_ID) override;
-        virtual void removeEdge(common::Edge* e) override;
+        void removeVertex(common::Node* v) override;
+        void removeEdge(common::Edge* e) override;
 
-        virtual Graph* makeSubGraph(const std::vector<int>& targetVertices, const std::vector<int>& targetEdges) const { return nullptr; };
+        Graph* clone() const override;
+        Graph* makeSubGraph(const std::vector<int>& targetVertices, const std::vector<int>& targetEdges) const override  { return nullptr; };
     };
 }

@@ -7,6 +7,6 @@ namespace directed {
     public:
         using common::Edge::Edge;
       
-        virtual void linkNodes() override;
+        void linkNodes() override;
     };
 };

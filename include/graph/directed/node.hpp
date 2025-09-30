@@ -8,8 +8,8 @@ namespace directed {
     public:
         using common::Node::Node;
 
-        virtual void linkTo(common::Node* neighbor, common::Edge* edge) override;
-        virtual void unlinkFrom(common::Node* neighbor) override;
+        void linkTo(common::Node* neighbor, common::Edge* edge) override;
+        void unlinkFrom(common::Node* neighbor) override;
 
         std::vector<common::Node*> entry() const;
         std::vector<common::Edge*> entryEdges() const;

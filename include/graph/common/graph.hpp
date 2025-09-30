@@ -6,7 +6,9 @@
 #include <memory>
 #include <iomanip>
 #include <unordered_map>
+#include <string>
 
+#include "json/json.hpp"
 #include "graph/common/node.hpp"
 #include "graph/common/edge.hpp"
 
@@ -15,25 +17,22 @@ namespace common {
     {
     public:
         virtual ~Graph() = default;
-        
-        virtual common::Node* newVertex() = 0;
+
+        virtual common::Node* newVertex(std::string label = "") =  0;
         virtual common::Edge* newEdge(int v1_ID, int v2_ID) = 0;
-        virtual common::Edge* newEdge(common::Node* v1_ID, common::Node* v2_ID) = 0;
-        
-        virtual void removeVertex(int v_ID) = 0;
-        virtual void removeVertex(common::Node* v_ID) = 0;
-        virtual void removeEdge(int e_ID) = 0;
-        virtual void removeEdge(common::Edge* e_ID) = 0;
-        
+        virtual common::Edge* newEdge(common::Node* v1, common::Node* v2) = 0;
+
+        virtual void removeVertex(common::Node* v) = 0;
+        virtual void removeEdge(common::Edge* e) = 0;
+
         common::Node* getVertex(int v_ID) const;
         common::Edge* getEdge(int e_ID) const;
-        common::Node* getOpposite(int v_ID, int e_ID) const;
         common::Node* getOpposite(common::Node* v, common::Edge* e) const;
         std::vector<common::Node*> getVertices() const;
         std::vector<common::Edge*> getEdges() const;
-        std::vector<common::Node*> getNodesFromEdge(int e_ID) const;
         std::vector<common::Node*> getNodesFromEdge(common::Edge* e) const;
 
+        virtual Graph* clone() const = 0; 
         virtual Graph* makeSubGraph(const std::vector<int>& targetVertices, const std::vector<int>& targetEdges) const = 0;
         
         int getOrder() const;

@@ -2,11 +2,6 @@
 
 using namespace common;
 
-void Graph::removeVertex(int n)
-{
-    removeVertex(getVertex(n));
-}
-
 common::Node* Graph::getVertex(int v_ID) const
 {
     auto it = vertices.find(v_ID);
@@ -17,11 +12,6 @@ common::Edge* Graph::getEdge(int e_ID) const
 {
     auto it = edges.find(e_ID);
     return (it != edges.end()) ? it->second.get() : nullptr;
-};
-
-common::Node* Graph::getOpposite(int v_ID, int e_ID) const
-{
-    return getOpposite(getVertex(v_ID), getEdge(e_ID));
 };
 
 common::Node* Graph::getOpposite(common::Node* v, common::Edge* e) const {
@@ -56,11 +46,6 @@ std::vector<common::Edge*> Graph::getEdges() const
     return result;
 };
 
-std::vector<common::Node*> Graph::getNodesFromEdge(int e_ID) const
-{
-    return getNodesFromEdge(getEdge(e_ID));
-};
-
 std::vector<common::Node*> Graph::getNodesFromEdge(common::Edge* e) const
 {
     if (!e)
@@ -92,11 +77,11 @@ void Graph::fastPrint() const
         std::cout << "Vertices in graph:" << std::endl;
         for (auto &v : vertices)
         {
-            std::cout << "\t" << v.first << " -> ";
+            std::cout << "\t" << v.second.get()->getLabel() << "[" << v.second.get()->getId() << "]" << " -> ";
             std::cout << "Adjacent: ";
             for (auto &n : v.second.get()->adj())
             {
-                std::cout << n->getId() << " ";
+                std::cout << "[" << n->getId() << "]" << " ";
             }
             std::cout << std::endl;
         }
@@ -105,19 +90,6 @@ void Graph::fastPrint() const
     {
         std::cout << "Still not a graph!" << std::endl;
         return;
-    }
-
-    std::cout << "\nEdges in graph:" << std::endl;
-    if (getSize() > 0)
-    {
-        for (auto &e : edges)
-        {
-            std::cout << "\t(" << e.second->getFirstNode()->getId() << ", " << e.second->getSecondNode()->getId() << ")" << std::endl;
-        }
-    }
-    else
-    {
-        std::cout << "∅" << std::endl;
     }
 };
 

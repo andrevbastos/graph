@@ -3,10 +3,10 @@
 #include "graph/undirected/edge.hpp"
 
 namespace undirected {
-    common::Node* Graph::newVertex()
+    common::Node* Graph::newVertex(std::string label)
     {
         int newId = nextNodeId++;
-        auto newNode = std::make_unique<undirected::Node>(newId);
+        auto newNode = std::make_unique<undirected::Node>(newId, label);
         common::Node* ptr = newNode.get();
         vertices.emplace(newId, std::move(newNode));
 
@@ -14,7 +14,9 @@ namespace undirected {
     };
 
     common::Edge* Graph::newEdge(int v1_ID, int v2_ID) {
-        return newEdge(getVertex(v1_ID), getVertex(v2_ID));
+        common::Node* v1 = getVertex(v1_ID);
+        common::Node* v2 = getVertex(v2_ID);
+        return newEdge(v1, v2);
     };
 
     common::Edge* Graph::newEdge(common::Node* v1, common::Node* v2)
@@ -35,10 +37,6 @@ namespace undirected {
 
         return ptr;
     };
-
-    void Graph::removeVertex(int v_ID) {
-        removeVertex(getVertex(v_ID));
-    };
     
     void Graph::removeVertex(common::Node* v) {
         if (!v || vertices.find(v->getId()) == vertices.end()) {
@@ -57,10 +55,6 @@ namespace undirected {
         }
         
         vertices.erase(v->getId());
-    }
-
-    void Graph::removeEdge(int e_ID) {
-        removeEdge(getEdge(e_ID));
     };
 
     void Graph::removeEdge(common::Edge* e) {
@@ -77,5 +71,32 @@ namespace undirected {
         }
 
         edges.erase(e->getId());
-    }
+    };
+
+    Graph* Graph::clone() const
+    {
+        Graph* newGraph = new undirected::Graph();
+
+        std::unordered_map<int, common::Node*> oldIdToNewNode;
+
+        for (common::Node* oldNode : this->getVertices()) {
+            if (oldNode) {
+                common::Node* newNode = newGraph->newVertex(oldNode->getLabel());
+                oldIdToNewNode[oldNode->getId()] = newNode;
+            }
+        }
+
+        for (common::Edge* oldEdge : this->getEdges()) {
+            if (oldEdge) {
+                auto nodes = this->getNodesFromEdge(oldEdge);
+                
+                common::Node* newV1 = oldIdToNewNode.at(nodes[0]->getId());
+                common::Node* newV2 = oldIdToNewNode.at(nodes[1]->getId());
+                
+                newGraph->newEdge(newV1, newV2);
+            }
+        }
+
+        return newGraph;
+    };
 };

@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <unordered_map>
+#include <string>
 
 #include "ifcg/common/vertex.hpp"
 #include "ifcg/graphics3D/geometry/mesh.hpp"
@@ -12,13 +13,14 @@ namespace common {
     class Node
     {
     public:
-        Node(int id)
-            : _id(id) {};
-    
+        Node(int id, const std::string& label)
+            : _id(id), _label(label) {};
+
         virtual void linkTo(common::Node* neighbor, common::Edge* edge) { _adj[neighbor] = edge; };
         virtual void unlinkFrom(common::Node* neighbor) { _adj.erase(neighbor); };
     
         int getId() const { return _id; };
+        const std::string& getLabel() const { return _label; };
         Edge* getEdgeTo(common::Node* neighbor) const { return (_adj.count(neighbor) > 0) ? _adj.at(neighbor) : nullptr; };
         
         std::vector<common::Node*> adj() const  {
@@ -37,11 +39,16 @@ namespace common {
 
             return result;
         };
+
+        bool adjTo(common::Node* neighbor) const {
+            return _adj.count(neighbor) > 0;
+        };
     
     protected:
         std::unordered_map<common::Node*, common::Edge*> _adj;
 
     private:
         int _id;
+        std::string _label;
     };
 }
