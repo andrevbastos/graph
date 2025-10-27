@@ -19,8 +19,8 @@ namespace common {
         virtual ~Graph() = default;
 
         virtual common::Node* newVertex(std::string label = "") =  0;
-        virtual common::Edge* newEdge(int v1_ID, int v2_ID) = 0;
-        virtual common::Edge* newEdge(common::Node* v1, common::Node* v2) = 0;
+        virtual common::Edge* newEdge(int v1_ID, int v2_ID, int weight = 1) = 0;
+        virtual common::Edge* newEdge(common::Node* v1, common::Node* v2, int weight = 1) = 0;
 
         virtual void removeVertex(common::Node* v) = 0;
         virtual void removeEdge(common::Edge* e) = 0;
@@ -30,6 +30,8 @@ namespace common {
         common::Node* getOpposite(common::Node* v, common::Edge* e) const;
         std::vector<common::Node*> getVertices() const;
         std::vector<common::Edge*> getEdges() const;
+        std::unordered_map<common::Edge*, int> getWeights() const;
+        virtual std::vector<std::vector<int>> getWeightMatrix() const = 0;
         std::vector<common::Node*> getNodesFromEdge(common::Edge* e) const;
 
         virtual Graph* clone() const = 0; 
@@ -44,6 +46,7 @@ namespace common {
     protected:
         std::unordered_map<int, std::unique_ptr<common::Node>> vertices;
         std::unordered_map<int, std::unique_ptr<common::Edge>> edges;
+        std::unordered_map<common::Edge*, int> weights;
 
         int nextNodeId = 0;
         int nextEdgeId = 0;

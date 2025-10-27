@@ -12,6 +12,8 @@
 #include "graph/util/dfs.hpp"
 #include "graph/util/goodman.hpp"
 #include "graph/util/set.hpp"
+#include "graph/util/dijkstra.hpp"
+#include "graph/util/floyd.hpp"
 
 using json = nlohmann::json;
 

@@ -13,13 +13,13 @@ namespace directed {
         return ptr;
     };
 
-    common::Edge* Graph::newEdge(int v1_ID, int v2_ID) {
+    common::Edge* Graph::newEdge(int v1_ID, int v2_ID, int weight) {
         common::Node* v1 = getVertex(v1_ID);
         common::Node* v2 = getVertex(v2_ID);
-        return newEdge(v1, v2);
+        return newEdge(v1, v2, weight);
     };
 
-    common::Edge* Graph::newEdge(common::Node* v1, common::Node* v2)
+    common::Edge* Graph::newEdge(common::Node* v1, common::Node* v2, int weight)
     {
         if (!v1 || !v2) return nullptr;
 
@@ -32,6 +32,7 @@ namespace directed {
         auto newEdge = std::make_unique<directed::Edge>(newId, v1, v2);
         common::Edge* ptr = newEdge.get();
         edges.emplace(newId, std::move(newEdge));
+        weights[ptr] = weight;
         
         ptr->linkNodes();
 
@@ -70,6 +71,27 @@ namespace directed {
         }
 
         edges.erase(e->getId());
+    };
+
+    std::vector<std::vector<int>> Graph::getWeightMatrix() const
+    {
+        int n = getOrder();
+        std::vector<std::vector<int>> matrix(n, std::vector<int>(n, std::numeric_limits<int>::max()));
+
+        for (int i = 0; i < n; ++i) {
+            matrix[i][i] = 0;
+        }
+
+        for (const auto& pair : edges) {
+            common::Edge* e = pair.second.get();
+            common::Node* u = e->getFirstNode();
+            common::Node* v = e->getSecondNode();
+            int weight = weights.at(e);
+
+            matrix[u->getId()][v->getId()] = weight;
+        }
+
+        return matrix;
     };
 
     Graph* Graph::clone() const

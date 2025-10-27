@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 #include <tuple>
 #include <unordered_map>
 #include <ostream>
@@ -100,8 +99,7 @@ int main()
 
     // DFS
     int i = 6;
-    while (i--)
-        g2.newVertex();
+    while (i--) g2.newVertex();
 
     g2.newEdge(0, 1);
     g2.newEdge(0, 3);

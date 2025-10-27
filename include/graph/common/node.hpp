@@ -4,9 +4,6 @@
 #include <unordered_map>
 #include <string>
 
-#include "ifcg/common/vertex.hpp"
-#include "ifcg/graphics3D/geometry/mesh.hpp"
-
 namespace common {
     class Edge; 
        

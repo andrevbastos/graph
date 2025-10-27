@@ -46,6 +46,11 @@ std::vector<common::Edge*> Graph::getEdges() const
     return result;
 };
 
+std::unordered_map<common::Edge*, int> Graph::getWeights() const
+{
+    return weights;
+};
+
 std::vector<common::Node*> Graph::getNodesFromEdge(common::Edge* e) const
 {
     if (!e)
