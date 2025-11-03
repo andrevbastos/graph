@@ -19,6 +19,7 @@ namespace common {
         int getId() const { return _id; };
         const std::string& getLabel() const { return _label; };
         Edge* getEdgeTo(common::Node* neighbor) const { return (_adj.count(neighbor) > 0) ? _adj.at(neighbor) : nullptr; };
+        int getOrder() const { return _adj.size(); }
         
         std::vector<common::Node*> adj() const  {
             std::vector<common::Node*> result;
