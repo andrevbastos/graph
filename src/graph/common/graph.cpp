@@ -82,7 +82,7 @@ void Graph::fastPrint() const
         std::cout << "Vertices in graph:" << std::endl;
         for (auto &v : vertices)
         {
-            std::cout << "\t" << v.second.get()->getLabel() << "[" << v.second.get()->getId() << "]" << " -> ";
+            std::cout << "\t[" << v.second.get()->getId() << "]" << " -> ";
             std::cout << "Adjacent: ";
             for (auto &n : v.second.get()->adj())
             {

@@ -3,10 +3,20 @@
 #include "graph/directed/edge.hpp"
 
 namespace directed {
-    common::Node* Graph::newVertex(std::string label)
+    common::Node* Graph::newVertex()
     {
         int newId = nextNodeId++;
-        auto newNode = std::make_unique<directed::Node>(newId, label);
+        auto newNode = std::make_unique<directed::Node>(newId);
+        common::Node* ptr = newNode.get();
+        vertices.emplace(newId, std::move(newNode));
+
+        return ptr;
+    };
+
+    common::Node* Graph::newVertex(std::any data)
+    {
+        int newId = nextNodeId++;
+        auto newNode = std::make_unique<directed::Node>(newId, data);
         common::Node* ptr = newNode.get();
         vertices.emplace(newId, std::move(newNode));
 
@@ -75,8 +85,16 @@ namespace directed {
 
     std::vector<std::vector<int>> Graph::getWeightMatrix() const
     {
-        int n = getOrder();
-        std::vector<std::vector<int>> matrix(n, std::vector<int>(n, std::numeric_limits<int>::max()));
+        std::vector<common::Node*> nodes = getVertices();
+        int n = nodes.size();
+        
+        std::unordered_map<int, int> tempIds;
+        for (int i = 0; i < n; ++i) {
+            tempIds[nodes[i]->getId()] = i;
+        }
+
+        int inf = std::numeric_limits<int>::max();
+        std::vector<std::vector<int>> matrix(n, std::vector<int>(n, inf));
 
         for (int i = 0; i < n; ++i) {
             matrix[i][i] = 0;
@@ -84,11 +102,10 @@ namespace directed {
 
         for (const auto& pair : edges) {
             common::Edge* e = pair.second.get();
-            common::Node* u = e->getFirstNode();
-            common::Node* v = e->getSecondNode();
-            int weight = weights.at(e);
+            int uId = tempIds.at(e->getFirstNode()->getId());
+            int vId = tempIds.at(e->getSecondNode()->getId());
 
-            matrix[u->getId()][v->getId()] = weight;
+            matrix[uId][vId] = weights.at(e);
         }
 
         return matrix;
@@ -102,7 +119,7 @@ namespace directed {
 
         for (common::Node* oldNode : this->getVertices()) {
             if (oldNode) {
-                common::Node* newNode = newGraph->newVertex(oldNode->getLabel());
+                common::Node* newNode = newGraph->newVertex(oldNode->getData());
                 
                 oldIdToNewNode[oldNode->getId()] = newNode;
             }

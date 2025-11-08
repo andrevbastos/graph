@@ -18,7 +18,8 @@ namespace common {
     public:
         virtual ~Graph() = default;
 
-        virtual common::Node* newVertex(std::string label = "") =  0;
+        virtual common::Node* newVertex() =  0;
+        virtual common::Node* newVertex(std::any data) = 0;
         virtual common::Edge* newEdge(int v1_ID, int v2_ID, int weight = 1) = 0;
         virtual common::Edge* newEdge(common::Node* v1, common::Node* v2, int weight = 1) = 0;
 

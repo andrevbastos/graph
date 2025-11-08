@@ -8,7 +8,7 @@ namespace util::Goodman {
     static int goodmanAlgorithm(common::Graph* g)
     {
         if (!g) return 0;
-        auto* graph = static_cast<undirected::Graph*>(g);
+        auto* graph = dynamic_cast<undirected::Graph*>(g);
         if (graph != g) return 0;
 
         auto* graphClone = graph->clone();

@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <unordered_map>
-#include <string>
+#include <any>
 
 namespace common {
     class Edge; 
@@ -10,16 +10,17 @@ namespace common {
     class Node
     {
     public:
-        Node(int id, const std::string& label)
-            : _id(id), _label(label) {};
+        Node(int id, std::any data = {})
+            : _id(id), _data(data) {};
 
         virtual void linkTo(common::Node* neighbor, common::Edge* edge) { _adj[neighbor] = edge; };
         virtual void unlinkFrom(common::Node* neighbor) { _adj.erase(neighbor); };
     
         int getId() const { return _id; };
-        const std::string& getLabel() const { return _label; };
         Edge* getEdgeTo(common::Node* neighbor) const { return (_adj.count(neighbor) > 0) ? _adj.at(neighbor) : nullptr; };
         int getOrder() const { return _adj.size(); }
+        std::any getData() const { return _data; };
+        bool hasData() const { return _data.has_value(); };
         
         std::vector<common::Node*> adj() const  {
             std::vector<common::Node*> result;
@@ -47,6 +48,6 @@ namespace common {
 
     private:
         int _id;
-        std::string _label;
+        std::any _data;
     };
 }

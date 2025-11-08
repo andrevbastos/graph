@@ -1,4 +1,4 @@
-#include "graph/util/set.hpp"
+#include "graph/util/union_find.hpp"
 
 namespace util {
     std::unordered_map<common::Node*, common::Node*> Set::_p;

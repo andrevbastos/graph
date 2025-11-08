@@ -11,12 +11,13 @@
 #include "graph/util/bfs.hpp"
 #include "graph/util/dfs.hpp"
 #include "graph/util/goodman.hpp"
-#include "graph/util/set.hpp"
+#include "graph/util/union_find.hpp"
 #include "graph/util/dijkstra.hpp"
 #include "graph/util/floyd.hpp"
+#include "graph/util/a_star.hpp"
+#include "json/json.hpp"
 
 using json = nlohmann::json;
-
 static common::Graph* loadGraphFromFile(const std::string& filePath) {
     std::ifstream file(filePath);
     if (!file.is_open()) {

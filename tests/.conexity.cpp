@@ -4,7 +4,7 @@
 
 int main()
 {
-    auto *g = loadGraphFromFile("../resources/json/undir_disjoint.json");
+    auto* g = loadGraphFromFile("../resources/json/undir_disjoint.json");
 
     std::cout << "-- BFS --" << std::endl;
     util::BFS::printComponents(g);

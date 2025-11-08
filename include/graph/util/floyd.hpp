@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "graph/common/graph.hpp"
 #include "graph/common/edge.hpp"
 
@@ -37,6 +36,33 @@ namespace util::Floyd {
         }
 
         return std::make_pair(d, r);
+    };
+
+    static std::vector<common::Node*> getShortestPath(common::Graph* g, common::Node* source, common::Node* target, std::vector<std::vector<common::Node*>> r = {}) {
+        if (r.empty()){
+            auto [_, new_r] = computeAllPairs(g); 
+            r = new_r;
+        }
+        std::vector<common::Node*> path;
+        int i = source->getId();
+        int j = target->getId();
+
+        if (r[i][j] == nullptr) {
+            return path;
+        }
+
+        int curr = j;
+        while (curr != i) {
+            path.push_back(g->getVertex(curr));
+            if (r[i][curr] == nullptr) { 
+                return {}; 
+            }
+            curr = r[i][curr]->getId();
+        }
+        path.push_back(source);
+
+        std::reverse(path.begin(), path.end());
+        return path;
     };
 
     void printPath(const std::vector<std::vector<common::Node*>>& r, int i, int j)
