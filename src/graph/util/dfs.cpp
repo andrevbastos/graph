@@ -2,7 +2,8 @@
 
 using namespace util;
 
-std::unordered_map<common::Node*, DFS::Data> DFS::getGraphData(common::Graph* graph) {
+std::unordered_map<common::Node*, DFS::Data> DFS::getGraphData(common::Graph* graph) 
+{
     std::unordered_map<common::Node*, Data> result;
     int time = 1;
 
@@ -22,7 +23,8 @@ std::unordered_map<common::Node*, DFS::Data> DFS::getGraphData(common::Graph* gr
     return result;
 };
 
-void DFS::printData(common::Graph* graph) {
+void DFS::printData(common::Graph* graph) 
+{
     std::unordered_map<common::Node*, DFS::Data> data = getGraphData(graph);
     for (const auto& pair : data) {
         common::Node* v = pair.first;
@@ -32,7 +34,8 @@ void DFS::printData(common::Graph* graph) {
     }
 };
 
-void DFS::tableData(common::Graph* graph) {
+void DFS::tableData(common::Graph* graph) 
+{
     std::unordered_map<common::Node*, DFS::Data> data = getGraphData(graph);
     std::cout << "| Vertex\t| Parent\t| Opening\t| Closing\t|" << std::endl;
     std::cout << "|\t-\t|\t-\t|\t-\t|\t-\t|" << std::endl;
@@ -61,7 +64,7 @@ std::unordered_map<common::Node*, common::Node*> DFS::getConnectedComponents(com
         }
     }
     return components;
-}
+};
 
 void DFS::printComponents(common::Graph* graph)
 {
@@ -93,7 +96,7 @@ void DFS::printComponents(common::Graph* graph)
     } else {
         std::cout << "The graph is empty." << std::endl;
     }
-}
+};
 
 void DFS::visit(common::Node* v, std::unordered_map<common::Node*, Data> &data, int &time) {
     data[v].color = GRAY;
@@ -120,4 +123,4 @@ void DFS::visitComponent(common::Node* u, common::Node* root, std::unordered_map
         }
     }
     nodeData.at(u).color = BLACK;
-}
+};

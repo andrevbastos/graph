@@ -2,13 +2,15 @@
 
 using namespace util;
 
-std::vector<common::Node*> BFS::getPath(common::Graph* graph, int start_ID, int target_ID) {
+std::vector<common::Node*> BFS::getPath(common::Graph* graph, int start_ID, int target_ID) 
+{
     common::Node* start = graph->getVertex(start_ID);
     common::Node* target = graph->getVertex(target_ID);
     return (start && target) ? getPath(graph, start, target) : std::vector<common::Node*>();
 };
 
-std::vector<common::Node*> BFS::getPath(common::Graph* graph, common::Node* start, common::Node* target) {
+std::vector<common::Node*> BFS::getPath(common::Graph* graph, common::Node* start, common::Node* target) 
+{    
     if (!graph || !start || !target) return {};
     if (start == target) return {start};
 
@@ -39,12 +41,14 @@ std::vector<common::Node*> BFS::getPath(common::Graph* graph, common::Node* star
     return path;
 };
 
-std::unordered_map<common::Node*, common::Node*> BFS::getRoutingVector(common::Graph* graph, int start_ID) {
+std::unordered_map<common::Node*, common::Node*> BFS::getRoutingVector(common::Graph* graph, int start_ID) 
+{
     common::Node* start = graph->getVertex(start_ID);
     return start ? getRoutingVector(graph, start) : std::unordered_map<common::Node*, common::Node*>();
 };
 
-std::unordered_map<common::Node*, common::Node*> BFS::getRoutingVector(common::Graph* graph, common::Node* start) {
+std::unordered_map<common::Node*, common::Node*> BFS::getRoutingVector(common::Graph* graph, common::Node* start) 
+{
     if (!graph || !start) return std::unordered_map<common::Node*, common::Node*>();
 
     std::unordered_map<common::Node*, Data> data;
@@ -82,12 +86,14 @@ std::unordered_map<common::Node*, common::Node*> BFS::getRoutingVector(common::G
     return routing;
 };
 
-void BFS::printData(common::Graph* graph, int start_ID) {
+void BFS::printData(common::Graph* graph, int start_ID) 
+{
     common::Node* start = graph->getVertex(start_ID);
     printData(graph, start);
 };
 
-void BFS::printData(common::Graph* graph, common::Node* start) {
+void BFS::printData(common::Graph* graph, common::Node* start) 
+{
     if (!graph || !start) return;
 
     std::unordered_map<common::Node*, common::Node*> routing = getRoutingVector(graph, start);
@@ -99,12 +105,14 @@ void BFS::printData(common::Graph* graph, common::Node* start) {
     }
 };
 
-void BFS::tableData(common::Graph* graph, int start_ID) {
+void BFS::tableData(common::Graph* graph, int start_ID) 
+{
     common::Node* start = graph->getVertex(start_ID);
     tableData(graph, start);
 };
 
-void BFS::tableData(common::Graph* graph, common::Node* start) {
+void BFS::tableData(common::Graph* graph, common::Node* start) 
+{
     if (!graph || !start) return;
 
     std::unordered_map<common::Node*, common::Node*> routing = getRoutingVector(graph, start);
@@ -153,7 +161,7 @@ std::unordered_map<common::Node*, common::Node*> BFS::getConnectedComponents(com
         }
     }
     return components;
-}
+};
 
 void BFS::printComponents(common::Graph* graph)
 {
@@ -185,4 +193,4 @@ void BFS::printComponents(common::Graph* graph)
     } else {
         std::cout << "The graph is empty." << std::endl;
     }
-}
+};

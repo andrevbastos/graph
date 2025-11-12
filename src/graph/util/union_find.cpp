@@ -4,7 +4,8 @@ namespace util {
     std::unordered_map<common::Node*, common::Node*> Set::_p;
     std::unordered_map<common::Node*, int> Set::_rank;
 
-    int Set::componentsCount(common::Graph* g) {
+    int Set::componentsCount(common::Graph* g) 
+    {
         if (!g) return 0;
         std::unordered_map<common::Node*, common::Node*> components = connectedComponents(g);
 

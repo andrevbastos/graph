@@ -11,18 +11,18 @@ int main() {
 
     auto* g = new undirected::Graph();
 
-    int w, h;
-    std::cout << "Altura: ";
-    std::cin >> w;
+    int h, w;
     std::cout << "Largura: ";
+    std::cin >> w;
+    std::cout << "Altura: ";
     std::cin >> h;
     std::cout << std::endl;
 
     const int totalNodes = w * h;
 
-    for (int i = 0; i < h; ++i) {
-        for (int j = 0; j < w; ++j) {
-            auto newNode = g->newVertex(std::make_pair(i, j));
+    for (int y = 0; y < h; ++y) {
+        for (int x = 0; x < w; ++x) {
+            auto newNode = g->newVertex(std::make_pair(x, y));
         }
     }
 
@@ -35,25 +35,40 @@ int main() {
         }
     }
 
-    obstacleGrid[0] = false;
-    obstacleGrid[totalNodes - 1] = false;
+    int startX, startY, endX, endY;
+    std::cout << "Coordenadas de início (x y): ";
+    std::cin >> startX >> startY;
+    std::cout << "Coordenadas de fim (x y): ";
+    std::cin >> endX >> endY;
+    
+    int startId = startY * w + startX;
+    int endId = endY * w + endX;
 
-    for (int i = 0; i < h; ++i) {
-        for (int j = 0; j < w; ++j) {
-            int currentId = i * w + j;
+    if (startId < 0 || startId >= totalNodes || endId < 0 || endId >= totalNodes) {
+        std::cerr << "Erro: Coordenadas fora dos limites." << std::endl;
+        delete g;
+        return 1;
+    }
+
+    obstacleGrid[startId] = false;
+    obstacleGrid[endId] = false;
+
+    for (int y = 0; y < h; ++y) {
+        for (int x = 0; x < w; ++x) {
+            int currentId = y * w + x;
             if (obstacleGrid[currentId]) continue; 
 
             common::Node* currentNode = g->getVertex(currentId);
 
-            if (j + 1 < w) {
-                int rightId = i * w + (j + 1);
+            if (x + 1 < w) {
+                int rightId = y * w + (x + 1);
                 if (!obstacleGrid[rightId]) {
                     g->newEdge(currentNode, g->getVertex(rightId));
                 }
             }
 
-            if (i + 1 < h) {
-                int bottomId = (i + 1) * w + j;
+            if (y + 1 < h) {
+                int bottomId = (y + 1) * w + x;
                 if (!obstacleGrid[bottomId]) {
                     g->newEdge(currentNode, g->getVertex(bottomId));
                 }
@@ -61,10 +76,10 @@ int main() {
         }
     }
 
-    std::cout << "Buscando caminho de (0,0) para (99,99)..." << std::endl;
-    auto path = util::AStar::getPath(g, 0, totalNodes - 1, util::AStar::euclideanHeuristic2D);
+    std::cout << "Buscando caminho de (" << startX << "," << startY << ") para (" << endX << "," << endY << ")..." << std::endl;
+    auto path = util::AStar::getPath(g, startId, endId, util::AStar::euclideanHeuristic2D);
 
-    std::cout << "Caminho de (0,0) para (" << h - 1 << "," << w - 1 << "):" << std::endl;
+    std::cout << "Caminho de (" << startX << "," << startY << ") para (" << endX << "," << endY << "):" << std::endl;
     for (const auto& node : path) {
         auto [row, col] = std::any_cast<std::pair<int, int>>(node->getData());
         std::cout << "(" << row << "," << col << ") ";
@@ -77,9 +92,9 @@ int main() {
     }
 
     std::cout << "\nGrid:\n";
-    for (int i = 0; i < h; ++i) {
-        for (int j = 0; j < w; ++j) {
-            int currentId = i * w + j;
+    for (int y = 0; y < h; ++y) {
+        for (int x = 0; x < w; ++x) {
+            int currentId = y * w + x;
             if (obstacleGrid[currentId]) {
                 std::cout << "# ";
             } else if (isPath[currentId]) {
