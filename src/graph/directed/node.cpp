@@ -5,18 +5,16 @@ namespace directed {
     void Node::linkTo(common::Node* neighbor, common::Edge* edge) {
         directed::Node* directedNeighbor = dynamic_cast<directed::Node*>(neighbor);
         directed::Edge* directedEdge = dynamic_cast<directed::Edge*>(edge);
-        if (directedNeighbor && directedEdge) {
+
+        if (directedNeighbor && directedEdge)
             common::Node::linkTo(directedNeighbor, directedEdge);
-            directedNeighbor->newEntry(this, directedEdge);
-        }
     };
 
     void Node::unlinkFrom(common::Node* neighbor) {
         directed::Node* directedNeighbor = dynamic_cast<directed::Node*>(neighbor);
-        if (directedNeighbor) {
+        
+        if (directedNeighbor)
             common::Node::unlinkFrom(neighbor);
-            directedNeighbor->removeEntry(this);
-        }
     };
 
     void Node::newEntry(common::Node* neighbor, common::Edge* edge) {

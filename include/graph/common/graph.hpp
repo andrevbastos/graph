@@ -1,3 +1,9 @@
+/**
+ * @file graph.hpp
+ * @author André V Bastos (andrevbastos)
+ * @brief Definition of the Graph class for graph representation.
+ */
+
 #pragma once
 
 #include <iostream>

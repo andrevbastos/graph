@@ -1,3 +1,9 @@
+/**
+ * @file node.hpp
+ * @author André V Bastos (andrevbastos)
+ * @brief Definition of the Node class for graph representation.
+ */
+
 #pragma once
 
 #include <vector>
@@ -10,38 +16,20 @@ namespace common {
     class Node
     {
     public:
-        Node(int id, std::any data = {})
-            : _id(id), _data(data) {};
+        Node(int id, std::any data = {});
 
-        virtual void linkTo(common::Node* neighbor, common::Edge* edge) { _adj[neighbor] = edge; };
-        virtual void unlinkFrom(common::Node* neighbor) { _adj.erase(neighbor); };
+        virtual void linkTo(common::Node* neighbor, common::Edge* edge);
+        virtual void unlinkFrom(common::Node* neighbor);
     
-        int getId() const { return _id; };
-        Edge* getEdgeTo(common::Node* neighbor) const { return (_adj.count(neighbor) > 0) ? _adj.at(neighbor) : nullptr; };
-        int getOrder() const { return _adj.size(); }
-        std::any getData() const { return _data; };
-        bool hasData() const { return _data.has_value(); };
+        int getId() const;
+        Edge* getEdgeTo(common::Node* neighbor) const;
+        int getOrder() const;
+        std::any getData() const;
+        bool hasData() const;
         
-        std::vector<common::Node*> adj() const  {
-            std::vector<common::Node*> result;
-            result.reserve(_adj.size());
-            for (const auto &pair : _adj)
-                result.push_back(pair.first);
-
-            return result;
-        };
-        std::vector<common::Edge*> edges() const  {
-            std::vector<common::Edge*> result;
-            result.reserve(_adj.size());
-            for (const auto &pair : _adj)
-                result.push_back(pair.second);
-
-            return result;
-        };
-
-        bool adjTo(common::Node* neighbor) const {
-            return _adj.count(neighbor) > 0;
-        };
+        std::vector<common::Node*> adj() const;
+        std::vector<common::Edge*> edges() const;
+        bool adjTo(common::Node* neighbor) const;
     
     protected:
         std::unordered_map<common::Node*, common::Edge*> _adj;

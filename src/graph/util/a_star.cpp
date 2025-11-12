@@ -14,9 +14,7 @@ namespace util::AStar {
         
         using Element = std::pair<double, int>;
         std::priority_queue<Element, std::vector<Element>, std::greater<Element>> openSet;
-
         std::unordered_map<int, double> gScore;
-
         std::unordered_map<int, int> cameFrom;
 
         double inf = std::numeric_limits<double>::infinity();
@@ -30,8 +28,8 @@ namespace util::AStar {
             openSet.pop();
 
             if (currentF > gScore[currentId] + heuristic(graph->getVertex(currentId), endNode) + 1e-9) {
-                    continue;
-            }
+                continue;
+            }   
 
             if (currentId == endId) {
                 std::vector<common::Node*> path;
@@ -53,7 +51,7 @@ namespace util::AStar {
                 
                 double weight = 1.0;
                 if (edge && edgeWeights.find(edge) != edgeWeights.end()) {
-                        weight = static_cast<double>(edgeWeights.at(edge));
+                    weight = static_cast<double>(edgeWeights.at(edge));
                 }
 
                 double tentative_gScore = gScore[currentId] + weight;

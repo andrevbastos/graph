@@ -1,21 +1,24 @@
+/**
+ * @file edge.hpp
+ * @author André V Bastos (andrevbastos)
+ * @brief Definition of the Edge class for graph representation.
+ */
+
 #pragma once
 
 #include <cassert>
 #include <utility>
-
-namespace directed { class Node; };
 
 namespace common {
     class Node;
 
     class Edge {
     public:
-        Edge(int id, common::Node* n1, common::Node* n2)
-            : _id(id), _nodes(n1, n2) {};
+        Edge(int id, common::Node* n1, common::Node* n2);
 
-        int getId() const { return _id; };
-        Node* getFirstNode() const { return _nodes.first;};
-        Node* getSecondNode() const { return _nodes.second;};
+        int getId() const;
+        Node* getFirstNode() const;
+        Node* getSecondNode() const;
 
         virtual void linkNodes() = 0;
         
