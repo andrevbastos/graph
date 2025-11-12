@@ -7,6 +7,9 @@
 namespace util {
     class Dijkstra {
     public:
+        using MinHeapPair = std::pair<int, common::Node*>;
+        using MinHeap = std::priority_queue<MinHeapPair, std::vector<MinHeapPair>, std::greater<MinHeapPair>>;
+
         struct Data {
             Data()
             : parent(nullptr), distance(std::numeric_limits<int>::max()) {};
@@ -15,11 +18,14 @@ namespace util {
             int distance;
         };
 
-        using MinHeapPair = std::pair<int, common::Node*>;
-        using MinHeap = std::priority_queue<MinHeapPair, std::vector<MinHeapPair>, std::greater<MinHeapPair>>;
         static std::unordered_map<common::Node*, Data> getPaths(common::Graph* graph, common::Node* start)
         {
-            std::unordered_map<common::Node*, Data> data = initializeSingleSource(graph, start);
+            std::unordered_map<common::Node*, Data> data;
+            for (common::Node* v : graph->getVertices()) {
+                data[v] = Data();
+            }
+            data[start].distance = 0;
+
             std::unordered_map<common::Edge*, int> w = graph->getWeights();
 
             std::vector<common::Node*> S = {};
@@ -80,16 +86,6 @@ namespace util {
         };
     
     private:
-        static std::unordered_map<common::Node*, Data> initializeSingleSource(common::Graph* graph, common::Node* source)
-        {
-            std::unordered_map<common::Node*, Data> data;
-            for (common::Node* v : graph->getVertices()) {
-                data[v] = Data();
-            }
-            data[source].distance = 0;
-            return data;
-        };
-
         static void relax(common::Edge* e, int w, std::unordered_map<common::Node*, Data>& data)
         {
             common::Node* u = e->getFirstNode();
