@@ -1,71 +1,133 @@
 #include "graph/util/postman.hpp"
 
+// std::vector<common::Node*> route;
+
+// // Inicialização
+// auto vertices = graph->getVertices();
+// std::vector<common::Node*> evenVertices;
+// for (auto v : vertices) {
+//     if (v->getOrder() % 2 == 0) evenVertices.push_back(v);
+// }
+// auto g = graph->clone();
+
+// // Calcula os caminhos mínimos
+// auto [distances, routes] = util::Floyd::computeAllPairs(g);
+// std::unordered_map<common::Node*, std::unordered_map<common::Node*, int>> d;
+// for (size_t i = 0; i < vertices.size(); i++) {
+//     for (size_t j = 0; j < vertices.size(); j++) {
+//         d[vertices[i]][vertices[j]] = distances[i][j];
+//     }
+// }
+
+// // Remove da matriz as linhas e colunas dos vértices de grau par
+// for (auto v : evenVertices) {
+//     d.erase(v);
+//     for (auto& [key, val] : d) {
+//         val.erase(v);
+//     }
+// }
+
+// // Laço principal
+// while (!d.empty()) {
+//     // Determine em D impar o par de vértices vi e vj com menor custo d(i,j)
+//     int smallest = std::numeric_limits<int>::max();
+//     common::Node* vi = nullptr;
+//     common::Node* vj = nullptr;
+//     for (const auto& [u, neighbors] : d) {
+//         for (const auto& [v, dist] : neighbors) {
+//             if (u != v && dist < smallest) {
+//                 smallest = dist;
+//                 vi = u;
+//                 vj = v;
+//             }
+//         }
+//     }
+
+//     // Construa um caminho artificial de vi para vj com custo d(i,j) no grafo G 
+//     if (vi && vj && vi != vj) {
+//         std::vector<common::Node*> artificialPath = util::Floyd::getShortestPath(g, vi, vj, routes);
+//         for (size_t i = 1; i < artificialPath.size(); i++) {
+//             auto u = artificialPath[i - 1];
+//             auto v = artificialPath[i];
+//             int cost = distances[u->getId()][v->getId()];
+//             g->newEdge(u, v, cost);
+//         }
+//     }
+
+//     // Remove da matriz as linhas e colunas de vi e vj
+//     d.erase(vi);
+//     d.erase(vj);
+//     for (auto& [key, val] : d) { 
+//         val.erase(vi); 
+//         val.erase(vj);
+//     }
+// }
+
+// return route;
+
 namespace util::Postman {
     std::vector<common::Node*> findDeliveryRoute(common::Graph* graph, common::Node* start)
     {
         std::vector<common::Node*> route;
 
         // Inicialização
+        // Vpar <- {conjunto dos vértices de grau par};
         auto vertices = graph->getVertices();
-        std::vector<common::Node*> evenVertices;
+        std::vector<bool> evenVertices;
         for (auto v : vertices) {
-            if (v->getOrder() % 2 == 0) evenVertices.push_back(v);
+            if (v->getOrder() % 2 == 0) evenVertices.push_back(true);
+            else evenVertices.push_back(false);
         }
-        auto g = graph->clone();
+
+        // Ge <- G;
+        auto ge = graph->clone();
 
         // Calcula os caminhos mínimos
-        auto [distances, routes] = util::Floyd::computeAllPairs(g);
+        // Execute FLOYD(G, W) para construir a matriz de distâncias Dn;
+        auto [distances, routes] = util::Floyd::computeAllPairs(ge);
+
+        // Remove da matriz as linhas e colunas dos vértices de grau par
+        // Dimpar <- Dn - (linhas e colunas de V par );
         std::unordered_map<common::Node*, std::unordered_map<common::Node*, int>> d;
         for (size_t i = 0; i < vertices.size(); i++) {
             for (size_t j = 0; j < vertices.size(); j++) {
+                if (evenVertices[i] || evenVertices[j]) continue;
                 d[vertices[i]][vertices[j]] = distances[i][j];
             }
         }
 
-        // Remove da matriz as linhas e colunas dos vértices de grau par
-        for (auto v : evenVertices) {
-            d.erase(v);
-            for (auto& [key, val] : d) {
-                val.erase(v);
-            }
-        }
-
         // Laço principal
+        // enquanto Dimpar != ∅ faça
         while (!d.empty()) {
-            // Determine em D impar o par de vértices vi e vj com menor custo d(i,j)
+            // Determine em Dimpar o par de vértices vi e vj com menor custo Dimpar i,j;
             int smallest = std::numeric_limits<int>::max();
-            common::Node* vi = nullptr;
-            common::Node* vj = nullptr;
+            std::pair<common::Node*, common::Node*> minPair = {nullptr, nullptr}; 
             for (const auto& [u, neighbors] : d) {
                 for (const auto& [v, dist] : neighbors) {
                     if (u != v && dist < smallest) {
                         smallest = dist;
-                        vi = u;
-                        vj = v;
+                        minPair = {u, v};
                     }
                 }
             }
 
-            // Construa um caminho artificial de vi para vj com custo d(i,j) no grafo G 
-            if (vi && vj && vi != vj) {
-                std::vector<common::Node*> artificialPath = util::Floyd::getShortestPath(g, vi, vj, routes);
-                for (size_t i = 1; i < artificialPath.size(); i++) {
-                    auto u = artificialPath[i - 1];
-                    auto v = artificialPath[i];
-                    int cost = distances[u->getId()][v->getId()];
-                    g->newEdge(u, v, cost);
-                }
-            }
+            // Construa um caminho artificial de vi para vj com custo Dimpar i,j no grafo Ge;
+            ge->newEdge(minPair.first, minPair.second, smallest);
 
             // Remove da matriz as linhas e colunas de vi e vj
-            d.erase(vi);
-            d.erase(vj);
-            for (auto& [key, val] : d) { 
-                val.erase(vi); 
-                val.erase(vj);
+            // Dimpar <- D impar - (linhas e colunas de vi e vj);
+            d.erase(minPair.first);
+            d.erase(minPair.second);
+            for (auto& [u, neighbors] : d) { 
+                neighbors.erase(minPair.first); 
+                neighbors.erase(minPair.second);
             }
         }
+
+        // Encontre um ciclo euleriano do grafo Ge;
+        route = util::Hierholzer::findEulerianCycle(ge);
 
         return route;
     };
 };
+

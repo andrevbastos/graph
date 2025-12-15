@@ -43,9 +43,6 @@ namespace util {
             result[n] = findSet(n);
         }
 
-        _p.clear();
-        _rank.clear();
-
         return result;
     };
 

@@ -20,12 +20,12 @@ namespace util {
             _rank.clear();
         };
 
-    private:
         static void makeSet(common::Node* n);
         static common::Node* findSet(common::Node* n);
         static void unionSet(common::Node* n1, common::Node* n2);
         static void link(common::Node* n1, common::Node* n2);
 
+    private:
         static std::unordered_map<common::Node*, common::Node*> _p;
         static std::unordered_map<common::Node*, int> _rank;
     };

@@ -84,10 +84,16 @@ namespace undirected {
         edges.erase(e->getId());
     };
 
-    std::vector<std::vector<int>> Graph::getWeightMatrix() const {
+    std::vector<std::vector<int>> Graph::getWeightMatrix() const 
+    {
         std::vector<common::Node*> nodes = getVertices();
+
+        std::sort(nodes.begin(), nodes.end(), [](common::Node* a, common::Node* b) {
+            return a->getId() < b->getId();
+        });
+
         int n = nodes.size();
-        
+
         std::unordered_map<int, int> tempIds;
         for (int i = 0; i < n; ++i) {
             tempIds[nodes[i]->getId()] = i;
@@ -102,11 +108,18 @@ namespace undirected {
 
         for (const auto& pair : edges) {
             common::Edge* e = pair.second.get();
+            
+            if (weights.find(e) == weights.end()) {
+                continue;
+            }
+
             int uId = tempIds.at(e->getFirstNode()->getId());
             int vId = tempIds.at(e->getSecondNode()->getId());
+            
+            int w = weights.at(e);
 
-            matrix[uId][vId] = weights.at(e);
-            matrix[vId][uId] = weights.at(e);
+            matrix[uId][vId] = w;
+            matrix[vId][uId] = w;
         }
 
         return matrix;

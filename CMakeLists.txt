@@ -69,7 +69,7 @@ message(STATUS "Biblioteca 'graph_lib' configurada.")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Adiciona o executável
-add_executable(graph_app tests/main.cpp)
+add_executable(graph_app tests/.search.cpp)
 
 # Linka a aplicação com a biblioteca de grafos
 # Como graph_lib expôs seu include como PUBLIC,
@@ -77,6 +77,16 @@ add_executable(graph_app tests/main.cpp)
 target_link_libraries(
     graph_app
     PRIVATE
+        graph_lib
+)
+
+# Adiciona outro executável para testes unitários
+add_executable(test tests/.test.cpp)
+
+# Linka o executável de testes com a biblioteca de grafos
+target_link_libraries(
+    test 
+    PRIVATE 
         graph_lib
 )
 

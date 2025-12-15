@@ -15,6 +15,9 @@
 #include "graph/util/dijkstra.hpp"
 #include "graph/util/floyd.hpp"
 #include "graph/util/a_star.hpp"
+#include "graph/util/hierholzer.hpp"
+#include "graph/util/kruskal.hpp"
+#include "graph/util/prim.hpp"
 #include "json/json.hpp"
 
 using json = nlohmann::json;
