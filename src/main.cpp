@@ -5,13 +5,11 @@
 
 #include "graph/graph.hpp"
 
-// RESOLUÇÃO COM GRAFOS
-
 std::vector<common::Node*> objects = {};
 int main() {
     auto* g = new undirected::Graph();
 
-    
+
 
     delete g;
     return 0;
