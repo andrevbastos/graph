@@ -19,12 +19,13 @@ target_link_libraries(graph_core PUBLIC
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     add_executable(graph main.cpp)
     target_link_libraries(graph PRIVATE graph_core)
+    
+    # Copia a pasta resources para a raiz do binário para ser acessível
+    add_custom_command(TARGET graph POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/resources
+        $<TARGET_FILE_DIR:graph>/resources
+        COMMENT "Copiando 'resources' para o diretório do executável..."
+    )
 endif()
 
-# Copia a pasta resources para a raiz do binário para ser acessível
-add_custom_command(TARGET graph POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_SOURCE_DIR}/resources
-    $<TARGET_FILE_DIR:graph>/resources
-    COMMENT "Copiando 'resources' para o diretório do executável..."
-)
