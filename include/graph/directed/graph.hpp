@@ -17,6 +17,5 @@ namespace directed {
         std::vector<std::vector<int>> getWeightMatrix() const override;
 
         Graph* clone() const override;
-        Graph* makeSubGraph(const std::vector<int>& targetVertices, const std::vector<int>& targetEdges) const override { return nullptr; };
     };
 }
