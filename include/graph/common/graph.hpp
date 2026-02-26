@@ -42,7 +42,6 @@ namespace common {
         std::vector<common::Node*> getNodesFromEdge(common::Edge* e) const;
 
         virtual Graph* clone() const = 0; 
-        virtual Graph* makeSubGraph(const std::vector<int>& targetVertices, const std::vector<int>& targetEdges) const = 0;
         
         int getOrder() const;
         int getSize() const;
