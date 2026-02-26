@@ -13,8 +13,8 @@
 #include <iomanip>
 #include <unordered_map>
 #include <string>
+#include <nlohmann/json.hpp>
 
-#include "json/json.hpp"
 #include "graph/common/node.hpp"
 #include "graph/common/edge.hpp"
 

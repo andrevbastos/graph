@@ -1,6 +1,7 @@
 #pragma once
 
 #include <queue>
+
 #include "graph/common/graph.hpp"
 
 namespace util {

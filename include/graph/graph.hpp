@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <nlohmann/json.hpp>
 
 #include "graph/common/graph.hpp"
 #include "graph/common/node.hpp"
@@ -18,7 +19,6 @@
 #include "graph/util/hierholzer.hpp"
 #include "graph/util/kruskal.hpp"
 #include "graph/util/prim.hpp"
-#include "json/json.hpp"
 
 using json = nlohmann::json;
 static common::Graph* loadGraphFromFile(const std::string& filePath) {

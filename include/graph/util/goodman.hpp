@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+
 #include "graph/undirected/graph.hpp"
 #include "graph/undirected/node.hpp"
 
