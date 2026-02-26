@@ -16,8 +16,10 @@ target_link_libraries(graph_core PUBLIC
 )
 
 # Executável final apenas linka com o core e adiciona o main.cpp
-add_executable(graph main.cpp)
-target_link_libraries(graph PRIVATE graph_core)
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    add_executable(graph main.cpp)
+    target_link_libraries(graph PRIVATE graph_core)
+endif()
 
 # Copia a pasta resources para a raiz do binário para ser acessível
 add_custom_command(TARGET graph POST_BUILD
