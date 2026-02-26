@@ -287,7 +287,7 @@ TEST(PostmanTest, ChinesePostmanRoute) {
     g->newEdge(v0, v1, 2);
     g->newEdge(v1, v2, 3);
 
-    auto route = util::Postman::findDeliveryRoute(g.get(), v0);
+    auto route = util::Postman::findDeliveryRoute(g.get());
 
     ASSERT_FALSE(route.empty()) << "A rota nao deve ser vazia";
     EXPECT_EQ(route.front(), route.back()) << "A rota do carteiro deve ser um ciclo fechado";
