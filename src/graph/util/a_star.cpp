@@ -17,8 +17,6 @@ namespace util::AStar {
         std::unordered_map<int, double> gScore;
         std::unordered_map<int, int> cameFrom;
 
-        double inf = std::numeric_limits<double>::infinity();
-        
         gScore[startId] = 0.0;
         double startF = heuristic(startNode, endNode);
         openSet.push({startF, startId});
