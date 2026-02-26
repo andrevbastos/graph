@@ -21,7 +21,7 @@
 #include "graph/util/prim.hpp"
 
 using json = nlohmann::json;
-static common::Graph* loadGraphFromFile(const std::string& filePath) {
+inline common::Graph* loadGraphFromFile(const std::string& filePath) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
         std::cerr << "Erro ao abrir o arquivo: " << filePath << std::endl;
