@@ -41,7 +41,6 @@ namespace util::Prim {
         pq.push({0, startNode});
 
         while (!pq.empty()) {
-            int uWeight = pq.top().first;
             common::Node* u = pq.top().second;
             pq.pop();
 

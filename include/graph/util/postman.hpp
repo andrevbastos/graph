@@ -5,5 +5,5 @@
 #include "graph/util/hierholzer.hpp"
 
 namespace util::Postman {
-    std::vector<common::Node*> findDeliveryRoute(common::Graph* graph, common::Node* start);
+    std::vector<common::Node*> findDeliveryRoute(common::Graph* graph);
 };
