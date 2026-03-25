@@ -130,4 +130,25 @@ namespace util::AStar {
         auto [x2, y2, z2] = posB;
         return std::abs(x1 - x2) + std::abs(y1 - y2) + std::abs(z1 - z2);
     };
+
+    double chebyshevHeuristic2D(common::Node* a, common::Node* b) 
+    {
+        auto [hasA, posA] = getCoords2D(a);
+        auto [hasB, posB] = getCoords2D(b);
+        if (!hasA || !hasB) return 0.0;
+        
+        return std::max(std::abs(posA.first - posB.first), std::abs(posA.second - posB.second));
+    };
+
+    double chebyshevHeuristic3D(common::Node* a, common::Node* b) 
+    {
+        auto [hasA, posA] = getCoords3D(a);
+        auto [hasB, posB] = getCoords3D(b);
+        if (!hasA || !hasB) return 0.0;
+        
+        auto [x1, y1, z1] = posA;
+        auto [x2, y2, z2] = posB;
+        
+        return std::max({std::abs(x1 - x2), std::abs(y1 - y2), std::abs(z1 - z2)});
+    };
 };
