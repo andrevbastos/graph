@@ -62,6 +62,7 @@ namespace util::Postman {
         // Encontre um ciclo euleriano do grafo Ge;
         route = util::Hierholzer::findEulerianCycle(ge);
 
+        delete ge;
         return route;
     };
 };
