@@ -27,4 +27,7 @@ namespace util::AStar {
 
     double manhattanHeuristic2D(common::Node* a, common::Node* b);
     double manhattanHeuristic3D(common::Node* a, common::Node* b);
+
+    double chebyshevHeuristic2D(common::Node* a, common::Node* b);
+    double chebyshevHeuristic3D(common::Node* a, common::Node* b);
 }
