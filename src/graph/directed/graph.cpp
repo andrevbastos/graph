@@ -132,24 +132,31 @@ namespace directed {
 
         std::unordered_map<int, common::Node*> oldIdToNewNode;
 
-        for (common::Node* oldNode : this->getVertices()) {
+        std::vector<common::Node*> nodes = this->getVertices();
+        std::sort(nodes.begin(), nodes.end(), [](common::Node* a, common::Node* b) {
+            return a->getId() < b->getId();
+        });
+
+        for (common::Node* oldNode : nodes) {
             if (oldNode) {
                 common::Node* newNode = newGraph->newVertex(oldNode->getData());
-                
                 oldIdToNewNode[oldNode->getId()] = newNode;
             }
         }
 
         for (common::Edge* oldEdge : this->getEdges()) {
             if (oldEdge) {
-                directed::Edge* directedOldEdge = static_cast<directed::Edge*>(oldEdge);
-                common::Node* sourceNode = directedOldEdge->getFirstNode();
-                common::Node* destinationNode = directedOldEdge->getSecondNode();
-
-                common::Node* newSource = oldIdToNewNode.at(sourceNode->getId());
-                common::Node* newDestination = oldIdToNewNode.at(destinationNode->getId());
+                auto edgeNodes = this->getNodesFromEdge(oldEdge);
                 
-                newGraph->newEdge(newSource, newDestination);
+                common::Node* newV1 = oldIdToNewNode.at(edgeNodes.first->getId());
+                common::Node* newV2 = oldIdToNewNode.at(edgeNodes.second->getId());
+                
+                int weight = 0;
+                if (weights.find(oldEdge) != weights.end()) {
+                    weight = weights.at(oldEdge);
+                }
+
+                newGraph->newEdge(newV1, newV2, weight);
             }
         }
 

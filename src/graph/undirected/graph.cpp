@@ -134,7 +134,12 @@ namespace undirected {
 
         std::unordered_map<int, common::Node*> oldIdToNewNode;
 
-        for (common::Node* oldNode : this->getVertices()) {
+        std::vector<common::Node*> nodes = this->getVertices();
+        std::sort(nodes.begin(), nodes.end(), [](common::Node* a, common::Node* b) {
+            return a->getId() < b->getId();
+        });
+
+        for (common::Node* oldNode : nodes) {
             if (oldNode) {
                 common::Node* newNode = newGraph->newVertex(oldNode->getData());
                 oldIdToNewNode[oldNode->getId()] = newNode;
@@ -148,7 +153,12 @@ namespace undirected {
                 common::Node* newV1 = oldIdToNewNode.at(nodes.first->getId());
                 common::Node* newV2 = oldIdToNewNode.at(nodes.second->getId());
                 
-                newGraph->newEdge(newV1, newV2);
+                int weight = 0;
+                if (weights.find(oldEdge) != weights.end()) {
+                    weight = weights.at(oldEdge);
+                }
+                
+                newGraph->newEdge(newV1, newV2, weight);
             }
         }
 
