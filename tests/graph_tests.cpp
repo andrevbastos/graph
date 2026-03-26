@@ -49,9 +49,6 @@ TEST(GraphBasicsTest, DirectedGraphCreationAndInsertion) {
 
     EXPECT_EQ(g->getSize(), 2) << "O tamanho (arestas) do grafo deve ser 2";
     
-    auto adjV1 = g->getNodesFromEdge(e1);
-    EXPECT_GT(adjV1.size(), 0) << "A aresta deve conectar nós";
-    
     EXPECT_EQ(g->getOpposite(v1, e1), v2) << "O oposto de v1 na aresta e1 deve ser v2";
 }
 

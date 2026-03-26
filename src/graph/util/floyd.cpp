@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <limits>
+
 #include "graph/util/floyd.hpp"
 
 namespace util::Floyd {

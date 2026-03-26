@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <limits>
+
 #include "graph/undirected/graph.hpp"
 #include "graph/undirected/node.hpp"
 #include "graph/undirected/edge.hpp"
@@ -142,8 +145,8 @@ namespace undirected {
             if (oldEdge) {
                 auto nodes = this->getNodesFromEdge(oldEdge);
                 
-                common::Node* newV1 = oldIdToNewNode.at(nodes[0]->getId());
-                common::Node* newV2 = oldIdToNewNode.at(nodes[1]->getId());
+                common::Node* newV1 = oldIdToNewNode.at(nodes.first->getId());
+                common::Node* newV2 = oldIdToNewNode.at(nodes.second->getId());
                 
                 newGraph->newEdge(newV1, newV2);
             }

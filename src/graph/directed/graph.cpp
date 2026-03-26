@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <limits>
+
 #include "graph/directed/graph.hpp"
 #include "graph/directed/node.hpp"
 #include "graph/directed/edge.hpp"
