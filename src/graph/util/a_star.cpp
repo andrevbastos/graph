@@ -97,58 +97,68 @@ namespace util::AStar {
 
     double euclideanHeuristic2D(common::Node* a, common::Node* b) 
     {
-        auto [hasA, posA] = getCoords2D(a);
-        auto [hasB, posB] = getCoords2D(b);
-        if (!hasA || !hasB) return 0.0;
-        return std::sqrt(std::pow(posA.first - posB.first, 2) + std::pow(posA.second - posB.second, 2));
+        try {
+            auto [xA, yA] = std::any_cast<std::tuple<int, int>>(a->getData());
+            auto [xB, yB] = std::any_cast<std::tuple<int, int>>(b->getData());
+            return std::sqrt(std::pow(xA - xB, 2) + std::pow(yA - yB, 2));
+        } catch (const std::bad_any_cast& e) {
+            return 0.0;
+        }
+
     };
 
     double euclideanHeuristic3D(common::Node* a, common::Node* b) 
     {
-        auto [hasA, posA] = getCoords3D(a);
-        auto [hasB, posB] = getCoords3D(b);
-        if (!hasA || !hasB) return 0.0;
-        auto [x1, y1, z1] = posA;
-        auto [x2, y2, z2] = posB;
-        return std::sqrt(std::pow(x2 - x1, 2) + std::pow(y2 - y1, 2) + std::pow(z2 - z1, 2));
+        try {
+            auto [xA, yA, zA] = std::any_cast<std::tuple<int, int, int>>(a->getData());
+            auto [xB, yB, zB] = std::any_cast<std::tuple<int, int, int>>(b->getData());
+            return std::sqrt(std::pow(xA - xB, 2) + std::pow(yA - yB, 2) + std::pow(zA - zB, 2));
+        } catch (const std::bad_any_cast& e) {
+            return 0.0;
+        }
     };
 
     double manhattanHeuristic2D(common::Node* a, common::Node* b) 
     {
-        auto [hasA, posA] = getCoords2D(a);
-        auto [hasB, posB] = getCoords2D(b);
-        if (!hasA || !hasB) return 0.0;
-        return std::abs(posA.first - posB.first) + std::abs(posA.second - posB.second);
+        try {
+            auto [xA, yA] = std::any_cast<std::tuple<int, int>>(a->getData());
+            auto [xB, yB] = std::any_cast<std::tuple<int, int>>(b->getData());
+            return std::abs(xA - xB) + std::abs(yA - yB);
+        } catch (const std::bad_any_cast& e) {
+            return 0.0;
+        }
     };
 
     double manhattanHeuristic3D(common::Node* a, common::Node* b) 
     {
-        auto [hasA, posA] = getCoords3D(a);
-        auto [hasB, posB] = getCoords3D(b);
-        if (!hasA || !hasB) return 0.0;
-        auto [x1, y1, z1] = posA;
-        auto [x2, y2, z2] = posB;
-        return std::abs(x1 - x2) + std::abs(y1 - y2) + std::abs(z1 - z2);
+        try {
+            auto [xA, yA, zA] = std::any_cast<std::tuple<int, int, int>>(a->getData());
+            auto [xB, yB, zB] = std::any_cast<std::tuple<int, int, int>>(b->getData());
+            return std::abs(xA - xB) + std::abs(yA - yB) + std::abs(zA - zB);
+        } catch (const std::bad_any_cast& e) {
+            return 0.0;
+        }
     };
 
     double chebyshevHeuristic2D(common::Node* a, common::Node* b) 
     {
-        auto [hasA, posA] = getCoords2D(a);
-        auto [hasB, posB] = getCoords2D(b);
-        if (!hasA || !hasB) return 0.0;
-        
-        return std::max(std::abs(posA.first - posB.first), std::abs(posA.second - posB.second));
+        try {
+            auto [xA, yA] = std::any_cast<std::tuple<int, int>>(a->getData());
+            auto [xB, yB] = std::any_cast<std::tuple<int, int>>(b->getData());
+            return std::max(std::abs(xA - xB), std::abs(yA - yB));
+        } catch (const std::bad_any_cast& e) {
+            return 0.0;
+        }
     };
 
     double chebyshevHeuristic3D(common::Node* a, common::Node* b) 
     {
-        auto [hasA, posA] = getCoords3D(a);
-        auto [hasB, posB] = getCoords3D(b);
-        if (!hasA || !hasB) return 0.0;
-        
-        auto [x1, y1, z1] = posA;
-        auto [x2, y2, z2] = posB;
-        
-        return std::max({std::abs(x1 - x2), std::abs(y1 - y2), std::abs(z1 - z2)});
+        try {
+            auto [xA, yA, zA] = std::any_cast<std::tuple<int, int, int>>(a->getData());
+            auto [xB, yB, zB] = std::any_cast<std::tuple<int, int, int>>(b->getData());
+            return std::max({std::abs(xA - xB), std::abs(yA - yB), std::abs(zA - zB)});
+        } catch (const std::bad_any_cast& e) {
+            return 0.0;
+        }
     };
 };
