@@ -51,11 +51,11 @@ std::unordered_map<common::Edge*, int> Graph::getWeights() const
     return weights;
 };
 
-std::vector<common::Node*> Graph::getNodesFromEdge(common::Edge* e) const
+std::pair<common::Node*, common::Node*> Graph::getNodesFromEdge(common::Edge* e) const
 {
     if (!e)
         return {};
-    return {e->getFirstNode(), e->getSecondNode()};
+    return std::make_pair(e->getFirstNode(), e->getSecondNode());
 };
 
 int Graph::getOrder() const

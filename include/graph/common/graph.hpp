@@ -13,7 +13,6 @@
 #include <iomanip>
 #include <unordered_map>
 #include <string>
-#include <nlohmann/json.hpp>
 
 #include "graph/common/node.hpp"
 #include "graph/common/edge.hpp"
@@ -39,7 +38,7 @@ namespace common {
         std::vector<common::Edge*> getEdges() const;
         std::unordered_map<common::Edge*, int> getWeights() const;
         virtual std::vector<std::vector<int>> getWeightMatrix() const = 0;
-        std::vector<common::Node*> getNodesFromEdge(common::Edge* e) const;
+        std::pair<common::Node*, common::Node*> getNodesFromEdge(common::Edge* e) const;
 
         virtual Graph* clone() const = 0; 
         

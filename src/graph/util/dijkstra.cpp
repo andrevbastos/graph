@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <limits>
+
 #include "graph/util/dijkstra.hpp"
 
 namespace util::Dijkstra {
