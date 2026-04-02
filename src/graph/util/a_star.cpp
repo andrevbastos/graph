@@ -76,6 +76,9 @@ namespace util::AStar {
         } else if (data.type() == typeid(std::pair<int, int>)) {
             auto p = std::any_cast<std::pair<int, int>>(data);
             return {true, {static_cast<double>(p.first), static_cast<double>(p.second)}};
+        } else if (data.type() == typeid(std::pair<float, float>)) {
+            auto p = std::any_cast<std::pair<float, float>>(data);
+            return {true, {static_cast<double>(p.first), static_cast<double>(p.second)}};
         }
         return {false, {0.0, 0.0}};
     };
@@ -89,6 +92,9 @@ namespace util::AStar {
         } else if (data.type() == typeid(std::tuple<int, int, int>)) {
             auto t = std::any_cast<std::tuple<int, int, int>>(data);
             return {true, {static_cast<double>(std::get<0>(t)), static_cast<double>(std::get<1>(t)), static_cast<double>(std::get<2>(t))}};
+        } else if (data.type() == typeid(std::tuple<float, float, float>)) {
+            auto t = std::any_cast<std::tuple<float, float, float>>(data);
+            return {true, {static_cast<double>(std::get<0>(t)), static_cast<double>(std::get<1>(t)), static_cast<double>(std::get<2>(t))}};
         }
         return {false, {0.0, 0.0, 0.0}};
     };
@@ -97,68 +103,79 @@ namespace util::AStar {
 
     double euclideanHeuristic2D(common::Node* a, common::Node* b) 
     {
-        try {
-            auto [xA, yA] = std::any_cast<std::tuple<int, int>>(a->getData());
-            auto [xB, yB] = std::any_cast<std::tuple<int, int>>(b->getData());
-            return std::sqrt(std::pow(xA - xB, 2) + std::pow(yA - yB, 2));
-        } catch (const std::bad_any_cast& e) {
-            return 0.0;
-        }
+        auto [validA, coordsA] = getCoords2D(a);
+        auto [validB, coordsB] = getCoords2D(b);
 
+        if (!validA || !validB) return 0.0;
+
+        auto [xA, yA] = coordsA;
+        auto [xB, yB] = coordsB;
+
+        return std::sqrt(std::pow(xA - xB, 2) + std::pow(yA - yB, 2));
     };
 
     double euclideanHeuristic3D(common::Node* a, common::Node* b) 
     {
-        try {
-            auto [xA, yA, zA] = std::any_cast<std::tuple<int, int, int>>(a->getData());
-            auto [xB, yB, zB] = std::any_cast<std::tuple<int, int, int>>(b->getData());
-            return std::sqrt(std::pow(xA - xB, 2) + std::pow(yA - yB, 2) + std::pow(zA - zB, 2));
-        } catch (const std::bad_any_cast& e) {
-            return 0.0;
-        }
+        auto [validA, coordsA] = getCoords3D(a);
+        auto [validB, coordsB] = getCoords3D(b);
+
+        if (!validA || !validB) return 0.0;
+
+        auto [xA, yA, zA] = coordsA;
+        auto [xB, yB, zB] = coordsB;
+
+        return std::sqrt(std::pow(xA - xB, 2) + std::pow(yA - yB, 2) + std::pow(zA - zB, 2));
     };
 
     double manhattanHeuristic2D(common::Node* a, common::Node* b) 
     {
-        try {
-            auto [xA, yA] = std::any_cast<std::tuple<int, int>>(a->getData());
-            auto [xB, yB] = std::any_cast<std::tuple<int, int>>(b->getData());
-            return std::abs(xA - xB) + std::abs(yA - yB);
-        } catch (const std::bad_any_cast& e) {
-            return 0.0;
-        }
+        auto [validA, coordsA] = getCoords2D(a);
+        auto [validB, coordsB] = getCoords2D(b);
+
+        if (!validA || !validB) return 0.0;
+
+        auto [xA, yA] = coordsA;
+        auto [xB, yB] = coordsB;
+
+        return std::abs(xA - xB) + std::abs(yA - yB);
     };
 
     double manhattanHeuristic3D(common::Node* a, common::Node* b) 
     {
-        try {
-            auto [xA, yA, zA] = std::any_cast<std::tuple<int, int, int>>(a->getData());
-            auto [xB, yB, zB] = std::any_cast<std::tuple<int, int, int>>(b->getData());
-            return std::abs(xA - xB) + std::abs(yA - yB) + std::abs(zA - zB);
-        } catch (const std::bad_any_cast& e) {
-            return 0.0;
-        }
+        auto [validA, coordsA] = getCoords3D(a);
+        auto [validB, coordsB] = getCoords3D(b);
+
+        if (!validA || !validB) return 0.0;
+
+        auto [xA, yA, zA] = coordsA;
+        auto [xB, yB, zB] = coordsB;
+
+        return std::abs(xA - xB) + std::abs(yA - yB) + std::abs(zA - zB);
     };
 
     double chebyshevHeuristic2D(common::Node* a, common::Node* b) 
     {
-        try {
-            auto [xA, yA] = std::any_cast<std::tuple<int, int>>(a->getData());
-            auto [xB, yB] = std::any_cast<std::tuple<int, int>>(b->getData());
+            auto [validA, coordsA] = getCoords2D(a);
+            auto [validB, coordsB] = getCoords2D(b);
+
+            if (!validA || !validB) return 0.0;
+
+            auto [xA, yA] = coordsA;
+            auto [xB, yB] = coordsB;
+
             return std::max(std::abs(xA - xB), std::abs(yA - yB));
-        } catch (const std::bad_any_cast& e) {
-            return 0.0;
-        }
     };
 
     double chebyshevHeuristic3D(common::Node* a, common::Node* b) 
     {
-        try {
-            auto [xA, yA, zA] = std::any_cast<std::tuple<int, int, int>>(a->getData());
-            auto [xB, yB, zB] = std::any_cast<std::tuple<int, int, int>>(b->getData());
-            return std::max({std::abs(xA - xB), std::abs(yA - yB), std::abs(zA - zB)});
-        } catch (const std::bad_any_cast& e) {
-            return 0.0;
-        }
+        auto [validA, coordsA] = getCoords3D(a);
+        auto [validB, coordsB] = getCoords3D(b);
+
+        if (!validA || !validB) return 0.0;
+
+        auto [xA, yA, zA] = coordsA;
+        auto [xB, yB, zB] = coordsB;
+        
+        return std::max({std::abs(xA - xB), std::abs(yA - yB), std::abs(zA - zB)});
     };
 };
