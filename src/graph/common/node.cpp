@@ -18,6 +18,7 @@ namespace common {
     Edge* Node::getEdgeTo(common::Node* neighbor) const { return (_adj.count(neighbor) > 0) ? _adj.at(neighbor) : nullptr; };
     int Node::getOrder() const { return _adj.size(); }
     std::any Node::getData() const { return _data; };
+    void Node::setData(std::any data) { _data = data; };
     bool Node::hasData() const { return _data.has_value(); };
 
     std::vector<common::Node*> Node::adj() const  {

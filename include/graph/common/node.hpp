@@ -25,6 +25,7 @@ namespace common {
         Edge* getEdgeTo(common::Node* neighbor) const;
         int getOrder() const;
         std::any getData() const;
+        void setData(std::any data);
         bool hasData() const;
         
         std::vector<common::Node*> adj() const;
