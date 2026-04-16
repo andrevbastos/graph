@@ -20,6 +20,7 @@
 namespace util {
     std::vector<common::Node*> AStar(common::Graph* graph, int startId, int endId, heuristics::HeuristicFunc heuristic);
     std::vector<common::Node*> AStarMod(common::Graph* graph, int startId, int endId, heuristics::HeuristicFunc heuristic);
+    std::vector<common::Node*> pathSmoothing(const std::vector<common::Node*>& rawPath, common::Graph* graph);
 
     template <typename T>
     std::vector<int> lwAStar(const common::lwGraph<T>& graph, int startId, int endId, std::function<double(const T&, const T&)> heuristic) 
@@ -78,18 +79,19 @@ namespace util {
         return {};
     }
 
-   template <typename T>
+    template <typename T>
     std::vector<int> lwAStarMod(const common::lwGraph<T>& graph, int startId, int endId, std::function<double(const T&, const T&)> heuristic) 
     {
-        int numVertices = graph.getOrder();
-
+        int numVertices = graph.getOrder(); 
+        
         if (startId < 0 || startId >= numVertices || endId < 0 || endId >= numVertices) return {};
         if (startId == endId) return {startId};
 
         std::vector<int> VM(numVertices, -1);
         std::vector<double> CM(numVertices, std::numeric_limits<double>::infinity());
         
-        std::priority_queue<std::pair<double, int>, std::vector<std::pair<double, int>>, std::greater<>> VPQ;
+        using Element = std::pair<double, int>;
+        std::priority_queue<Element, std::vector<Element>, std::greater<Element>> VPQ;
 
         VPQ.push({0.0, startId});
         CM[startId] = 0.0;
@@ -97,67 +99,68 @@ namespace util {
         const T& endData = graph.getVertexData(endId);
 
         while (!VPQ.empty()) {
-            auto AV = VPQ.top().second;
+            auto [currentF, currentId] = VPQ.top();
             VPQ.pop();
 
-            if (AV == endId) {
+            if (currentId == endId) {
                 std::vector<int> VL;
-                for (int node = endId; node != -1; node = VM[node]) {
-                    VL.push_back(node);
+                int curr = endId;
+                while (curr != -1) {
+                    VL.push_back(curr);
+                    curr = VM[curr];
                 }
                 std::reverse(VL.begin(), VL.end());
-
-                if (VL.size() <= 2) return VL;
-
-                std::vector<int> PL;
-                PL.push_back(VL[0]);
-
-                for (size_t i = 1; i < VL.size() - 1; ++i) {
-                    int P1 = PL.back();
-                    int P2 = VL[i];
-                    int P3 = VL[i+1];
-
-                    const T& data1 = graph.getVertexData(P1);
-                    const T& data2 = graph.getVertexData(P2);
-                    const T& data3 = graph.getVertexData(P3);
-
-                    // Acesso direto às propriedades x e y do seu tipo T
-                    float crossProduct = (data2.x - data1.x) * (data3.y - data2.y) - (data2.y - data1.y) * (data3.x - data2.x);
-                    bool isCollinear = std::abs(crossProduct) < 0.001f;
-
-                    if (!isCollinear) {
-                        PL.push_back(P2);
-                    }
-                }
                 
-                PL.push_back(VL.back());
-                return PL; 
+                return VL; 
             }
 
-            const auto& NV = graph.adj(AV);
-            const T& avData = graph.getVertexData(AV);
+            const T& avData = graph.getVertexData(currentId);
 
-            for (const auto& adj : NV) {
+            for (const auto& adj : graph.adj(currentId)) {
                 int neighbor = adj.target;
-                double VC = CM[AV] + adj.weight;
-                
-                if (VC < CM[neighbor]) {
-                    CM[neighbor] = VC;
+                double tentative_gScore = CM[currentId] + adj.weight;
+
+                if (tentative_gScore < CM[neighbor]) {
+                    CM[neighbor] = tentative_gScore;
+                    VM[neighbor] = currentId;
                     
                     const T& neighborData = graph.getVertexData(neighbor);
-
                     bool isDiagonal = (avData.x != neighborData.x) && (avData.y != neighborData.y);
-                    
                     double M = isDiagonal ? std::sqrt(2.0) : 1.0; 
                     
-                    double NVP = VC + heuristic(neighborData, endData) * M;
+                    double f = tentative_gScore + heuristic(neighborData, endData) * M;
                     
-                    VPQ.push({NVP, neighbor});
-                    VM[neighbor] = AV;
+                    VPQ.push({f, neighbor});
                 }
             }
         }
         
         return {};
     }
-}
+
+    template <typename T>
+    std::vector<int> lwPathSmoothing(const std::vector<int>& rawPath, const common::lwGraph<T>& graph) 
+    {
+        if (rawPath.size() <= 2) return rawPath;
+
+        std::vector<int> smoothedPath;
+        smoothedPath.push_back(rawPath[0]);
+
+        for (size_t i = 1; i < rawPath.size() - 1; ++i) {
+            const T& p1 = graph.getVertexData(smoothedPath.back());
+            const T& p2 = graph.getVertexData(rawPath[i]);
+            const T& p3 = graph.getVertexData(rawPath[i+1]);
+
+            // Acesso direto às propriedades da sua struct Vertex3D/Point
+            float crossProduct = (p2.x - p1.x) * (p3.y - p2.y) - (p2.y - p1.y) * (p3.x - p2.x);
+            bool isCollinear = std::abs(crossProduct) < 0.001f;
+
+            if (!isCollinear) {
+                smoothedPath.push_back(rawPath[i]);
+            }
+        }
+        
+        smoothedPath.push_back(rawPath.back());
+        return smoothedPath;
+    }
+};
