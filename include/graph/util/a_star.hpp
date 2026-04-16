@@ -20,7 +20,7 @@
 namespace util {
     std::vector<common::Node*> AStar(common::Graph* graph, int startId, int endId, heuristics::HeuristicFunc heuristic);
     std::vector<common::Node*> AStarMod(common::Graph* graph, int startId, int endId, heuristics::HeuristicFunc heuristic);
-    std::vector<common::Node*> pathSmoothing(const std::vector<common::Node*>& rawPath, common::Graph* graph);
+    std::vector<common::Node*> pathSmoothing(const std::vector<common::Node*>& rawPath);
 
     template <typename T>
     std::vector<int> lwAStar(const common::lwGraph<T>& graph, int startId, int endId, std::function<double(const T&, const T&)> heuristic) 

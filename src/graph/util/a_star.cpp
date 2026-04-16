@@ -125,7 +125,7 @@ namespace util {
         return {};
     }
 
-    std::vector<common::Node*> pathSmoothing(const std::vector<common::Node*>& rawPath, common::Graph* graph)
+    std::vector<common::Node*> pathSmoothing(const std::vector<common::Node*>& rawPath)
     {
         if (rawPath.size() <= 2) return rawPath;
 
