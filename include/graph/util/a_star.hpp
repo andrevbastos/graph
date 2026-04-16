@@ -134,10 +134,6 @@ namespace util {
                 return smoothedPath;
             }
 
-            if (currentF > gScore[currentId] + heuristic(graph.getVertexData(currentId), endData) + 1e-9) {
-                continue; 
-            }
-
             const T& currentData = graph.getVertexData(currentId);
 
             for (const auto& edge : graph.adj(currentId)) {
