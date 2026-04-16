@@ -78,80 +78,82 @@ namespace util {
         return {};
     }
 
-    template <typename T>
+   template <typename T>
     std::vector<int> lwAStarMod(const common::lwGraph<T>& graph, int startId, int endId, std::function<double(const T&, const T&)> heuristic) 
     {
-        int numVertices = graph.getOrder(); 
-        
+        int numVertices = graph.getOrder();
+
         if (startId < 0 || startId >= numVertices || endId < 0 || endId >= numVertices) return {};
         if (startId == endId) return {startId};
 
-        std::vector<double> gScore(numVertices, std::numeric_limits<double>::infinity());
-        std::vector<int> cameFrom(numVertices, -1);
-
-        using Element = std::pair<double, int>;
-        std::priority_queue<Element, std::vector<Element>, std::greater<Element>> openSet;
-
-        gScore[startId] = 0.0;
+        std::vector<int> VM(numVertices, -1);
+        std::vector<double> CM(numVertices, std::numeric_limits<double>::infinity());
         
-        const T& startData = graph.getVertexData(startId);
+        std::priority_queue<std::pair<double, int>, std::vector<std::pair<double, int>>, std::greater<>> VPQ;
+
+        VPQ.push({0.0, startId});
+        CM[startId] = 0.0;
+        
         const T& endData = graph.getVertexData(endId);
-        
-        openSet.push({heuristic(startData, endData), startId});
 
-        while (!openSet.empty()) {
-            auto [currentF, currentId] = openSet.top();
-            openSet.pop();
+        while (!VPQ.empty()) {
+            auto AV = VPQ.top().second;
+            VPQ.pop();
 
-            if (currentId == endId) {
-                std::vector<int> rawPath;
-                int curr = endId;
-                while (curr != -1) {
-                    rawPath.push_back(curr);
-                    curr = cameFrom[curr];
+            if (AV == endId) {
+                std::vector<int> VL;
+                for (int node = endId; node != -1; node = VM[node]) {
+                    VL.push_back(node);
                 }
-                std::reverse(rawPath.begin(), rawPath.end());
+                std::reverse(VL.begin(), VL.end());
 
-                if (rawPath.size() <= 2) return rawPath;
+                if (VL.size() <= 2) return VL;
 
-                std::vector<int> smoothedPath;
-                smoothedPath.push_back(rawPath[0]);
+                std::vector<int> PL;
+                PL.push_back(VL[0]);
 
-                for (size_t i = 1; i < rawPath.size() - 1; ++i) {
-                    const T& p1 = graph.getVertexData(smoothedPath.back());
-                    const T& p2 = graph.getVertexData(rawPath[i]);
-                    const T& p3 = graph.getVertexData(rawPath[i+1]);
+                for (size_t i = 1; i < VL.size() - 1; ++i) {
+                    int P1 = PL.back();
+                    int P2 = VL[i];
+                    int P3 = VL[i+1];
 
-                    float crossProduct = (p2.x - p1.x) * (p3.y - p2.y) - (p2.y - p1.y) * (p3.x - p2.x);
+                    const T& data1 = graph.getVertexData(P1);
+                    const T& data2 = graph.getVertexData(P2);
+                    const T& data3 = graph.getVertexData(P3);
+
+                    // Acesso direto às propriedades x e y do seu tipo T
+                    float crossProduct = (data2.x - data1.x) * (data3.y - data2.y) - (data2.y - data1.y) * (data3.x - data2.x);
                     bool isCollinear = std::abs(crossProduct) < 0.001f;
 
                     if (!isCollinear) {
-                        smoothedPath.push_back(rawPath[i]);
+                        PL.push_back(P2);
                     }
                 }
                 
-                smoothedPath.push_back(rawPath.back());
-                return smoothedPath;
+                PL.push_back(VL.back());
+                return PL; 
             }
 
-            const T& currentData = graph.getVertexData(currentId);
+            const auto& NV = graph.adj(AV);
+            const T& avData = graph.getVertexData(AV);
 
-            for (const auto& edge : graph.adj(currentId)) {
-                int neighborId = edge.target;
-                const T& neighborData = graph.getVertexData(neighborId);
-
-                double tentative_gScore = gScore[currentId] + edge.weight;
-
-                if (tentative_gScore < gScore[neighborId]) {
-                    cameFrom[neighborId] = currentId;
-                    gScore[neighborId] = tentative_gScore;
+            for (const auto& adj : NV) {
+                int neighbor = adj.target;
+                double VC = CM[AV] + adj.weight;
+                
+                if (VC < CM[neighbor]) {
+                    CM[neighbor] = VC;
                     
-                    bool isDiagonal = (currentData.x != neighborData.x) && (currentData.y != neighborData.y);
+                    const T& neighborData = graph.getVertexData(neighbor);
+
+                    bool isDiagonal = (avData.x != neighborData.x) && (avData.y != neighborData.y);
+                    
                     double M = isDiagonal ? std::sqrt(2.0) : 1.0; 
                     
-                    double f = tentative_gScore + heuristic(neighborData, endData) * M;
+                    double NVP = VC + heuristic(neighborData, endData) * M;
                     
-                    openSet.push({f, neighborId});
+                    VPQ.push({NVP, neighbor});
+                    VM[neighbor] = AV;
                 }
             }
         }
