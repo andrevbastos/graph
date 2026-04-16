@@ -7,7 +7,7 @@
 
 std::vector<common::Node*> objects = {};
 int main() {
-    auto* g = new undirected::Graph();
+    auto* g = new undirected::lwGraph<int>(5);
 
     
 

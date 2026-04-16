@@ -1,7 +1,7 @@
 #include "graph/util/a_star.hpp"
 
-namespace util::AStar {
-    std::vector<common::Node*> getPath(common::Graph* graph, int startId, int endId, HeuristicFunc heuristic) 
+namespace util {
+    std::vector<common::Node*> AStar(common::Graph* graph, int startId, int endId, heuristics::HeuristicFunc heuristic) 
     {
         if (!graph) return {};
         common::Node* startNode = graph->getVertex(startId);
@@ -67,115 +67,90 @@ namespace util::AStar {
         return {};
     };
 
-    std::pair<bool, std::pair<double, double>> getCoords2D(common::Node* n) 
+    std::vector<common::Node*> AStarMod(common::Graph* graph, int startId, int endId, util::heuristics::HeuristicFunc heuristic)
     {
-        if (!n->hasData()) return {false, {0.0, 0.0}};
-        const std::any& data = n->getData();
-        if (data.type() == typeid(std::pair<double, double>)) {
-            return {true, std::any_cast<std::pair<double, double>>(data)};
-        } else if (data.type() == typeid(std::pair<int, int>)) {
-            auto p = std::any_cast<std::pair<int, int>>(data);
-            return {true, {static_cast<double>(p.first), static_cast<double>(p.second)}};
-        } else if (data.type() == typeid(std::pair<float, float>)) {
-            auto p = std::any_cast<std::pair<float, float>>(data);
-            return {true, {static_cast<double>(p.first), static_cast<double>(p.second)}};
-        }
-        return {false, {0.0, 0.0}};
-    };
+        auto* SV = graph->getVertex(startId);
+        auto* EV = graph->getVertex(endId);
+        auto W = graph->getWeights();
 
-    std::pair<bool, std::tuple<double, double, double>> getCoords3D(common::Node* n) 
-    {
-        if (!n->hasData()) return {false, {0.0, 0.0, 0.0}};
-        const std::any& data = n->getData();
-        if (data.type() == typeid(std::tuple<double, double, double>)) {
-            return {true, std::any_cast<std::tuple<double, double, double>>(data)};
-        } else if (data.type() == typeid(std::tuple<int, int, int>)) {
-            auto t = std::any_cast<std::tuple<int, int, int>>(data);
-            return {true, {static_cast<double>(std::get<0>(t)), static_cast<double>(std::get<1>(t)), static_cast<double>(std::get<2>(t))}};
-        } else if (data.type() == typeid(std::tuple<float, float, float>)) {
-            auto t = std::any_cast<std::tuple<float, float, float>>(data);
-            return {true, {static_cast<double>(std::get<0>(t)), static_cast<double>(std::get<1>(t)), static_cast<double>(std::get<2>(t))}};
-        }
-        return {false, {0.0, 0.0, 0.0}};
-    };
-
-    double zeroHeuristic(common::Node*, common::Node*) { return 0.0; };
-
-    double euclideanHeuristic2D(common::Node* a, common::Node* b) 
-    {
-        auto [validA, coordsA] = getCoords2D(a);
-        auto [validB, coordsB] = getCoords2D(b);
-
-        if (!validA || !validB) return 0.0;
-
-        auto [xA, yA] = coordsA;
-        auto [xB, yB] = coordsB;
-
-        return std::sqrt(std::pow(xA - xB, 2) + std::pow(yA - yB, 2));
-    };
-
-    double euclideanHeuristic3D(common::Node* a, common::Node* b) 
-    {
-        auto [validA, coordsA] = getCoords3D(a);
-        auto [validB, coordsB] = getCoords3D(b);
-
-        if (!validA || !validB) return 0.0;
-
-        auto [xA, yA, zA] = coordsA;
-        auto [xB, yB, zB] = coordsB;
-
-        return std::sqrt(std::pow(xA - xB, 2) + std::pow(yA - yB, 2) + std::pow(zA - zB, 2));
-    };
-
-    double manhattanHeuristic2D(common::Node* a, common::Node* b) 
-    {
-        auto [validA, coordsA] = getCoords2D(a);
-        auto [validB, coordsB] = getCoords2D(b);
-
-        if (!validA || !validB) return 0.0;
-
-        auto [xA, yA] = coordsA;
-        auto [xB, yB] = coordsB;
-
-        return std::abs(xA - xB) + std::abs(yA - yB);
-    };
-
-    double manhattanHeuristic3D(common::Node* a, common::Node* b) 
-    {
-        auto [validA, coordsA] = getCoords3D(a);
-        auto [validB, coordsB] = getCoords3D(b);
-
-        if (!validA || !validB) return 0.0;
-
-        auto [xA, yA, zA] = coordsA;
-        auto [xB, yB, zB] = coordsB;
-
-        return std::abs(xA - xB) + std::abs(yA - yB) + std::abs(zA - zB);
-    };
-
-    double chebyshevHeuristic2D(common::Node* a, common::Node* b) 
-    {
-            auto [validA, coordsA] = getCoords2D(a);
-            auto [validB, coordsB] = getCoords2D(b);
-
-            if (!validA || !validB) return 0.0;
-
-            auto [xA, yA] = coordsA;
-            auto [xB, yB] = coordsB;
-
-            return std::max(std::abs(xA - xB), std::abs(yA - yB));
-    };
-
-    double chebyshevHeuristic3D(common::Node* a, common::Node* b) 
-    {
-        auto [validA, coordsA] = getCoords3D(a);
-        auto [validB, coordsB] = getCoords3D(b);
-
-        if (!validA || !validB) return 0.0;
-
-        auto [xA, yA, zA] = coordsA;
-        auto [xB, yB, zB] = coordsB;
+        std::unordered_map<common::Node*, common::Node*> VM;
+        std::unordered_map<common::Node*, double> CM;
         
-        return std::max({std::abs(xA - xB), std::abs(yA - yB), std::abs(zA - zB)});
-    };
+        std::priority_queue<std::pair<double, common::Node*>, std::vector<std::pair<double, common::Node*>>, std::greater<>> VPQ;
+
+        VPQ.push({0.0, SV});
+        VM[SV] = nullptr;
+        CM[SV] = 0.0;
+
+        while (!VPQ.empty()) {
+            auto AV = VPQ.top().second;
+            VPQ.pop();
+
+            if (AV == EV) {
+                std::vector<common::Node*> VL;
+                for (auto* node = EV; node != nullptr; node = VM[node]) {
+                    VL.push_back(node);
+                }
+                std::reverse(VL.begin(), VL.end());
+
+                if (VL.size() <= 2) return VL;
+
+                std::vector<common::Node*> PL;
+                PL.push_back(VL[0]);
+
+                for (size_t i = 1; i < VL.size() - 1; ++i) {
+                    common::Node* P1 = PL.back();
+                    common::Node* P2 = VL[i];
+                    common::Node* P3 = VL[i+1];
+
+                    auto [valid1, coords1] = util::getCoords3D(P1);
+                    auto [valid2, coords2] = util::getCoords3D(P2);
+                    auto [valid3, coords3] = util::getCoords3D(P3);
+
+                    if (!valid1 || !valid2 || !valid3) return {};
+
+                    auto [x1, y1, z1] = coords1;
+                    auto [x2, y2, z2] = coords2;
+                    auto [x3, y3, z3] = coords3;
+
+                    float crossProduct = (x2 - x1) * (y3 - y2) - (y2 - y1) * (x3 - x2);
+                    bool isCollinear = std::abs(crossProduct) < 0.001f;
+
+                    if (!isCollinear) {
+                        PL.push_back(P2);
+                    }
+                }
+                
+                PL.push_back(VL.back());
+                return PL; 
+            }
+
+            auto NV = AV->adj();
+            for (auto* neighbor : NV) {
+                auto VC = CM[AV] + W[AV->getEdgeTo(neighbor)];
+                
+                if (CM.find(neighbor) == CM.end() || VC < CM[neighbor]) {
+                    CM[neighbor] = VC;
+                    
+                    auto [validAV, coordsAV] = util::getCoords3D(AV);
+                    auto [validNeighbor, coordsNeighbor] = util::getCoords3D(neighbor);
+
+                    if (!validAV || !validNeighbor) continue;
+
+                    auto [ax, ay, az] = coordsAV;
+                    auto [nx, ny, nz] = coordsNeighbor;
+
+                    bool isDiagonal = (ax != nx) && (ay != ny);
+                    
+                    double M = isDiagonal ? std::sqrt(2.0) : 1.0; 
+                    auto NVP = VC + heuristic(neighbor, EV) * M;
+                    
+                    VPQ.push({NVP, neighbor});
+                    VM[neighbor] = AV;
+                }
+            }
+        }
+        
+        return {};
+    }
 };

@@ -270,7 +270,7 @@ TEST(AStarTest, PathfindingWithHeuristic) {
     g->newEdge(n1, n3, 10);
     g->newEdge(n2, n3, 2);
 
-    auto path = util::AStar::getPath(g.get(), n1->getId(), n2->getId(), util::AStar::zeroHeuristic);
+    auto path = util::AStar(g.get(), n1->getId(), n2->getId(), util::heuristics::zeroHeuristic);
     EXPECT_EQ(path.size(), 2) << "A* deve encontrar caminho direto em caso sem obstaculo";
 }
 

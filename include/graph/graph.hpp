@@ -4,10 +4,13 @@
 #include <nlohmann/json.hpp>
 
 #include "graph/common/graph.hpp"
+#include "graph/common/lw_graph.hpp"
 #include "graph/common/node.hpp"
 #include "graph/directed/graph.hpp"
+#include "graph/directed/lw_graph.hpp"
 #include "graph/directed/node.hpp"
 #include "graph/undirected/graph.hpp"
+#include "graph/undirected/lw_graph.hpp"
 #include "graph/undirected/node.hpp"
 #include "graph/util/bfs.hpp"
 #include "graph/util/dfs.hpp"
