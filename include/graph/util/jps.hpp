@@ -8,7 +8,7 @@
 #include <cmath>
 
 #include "graph/util/node_data.hpp"
-#include "graph/undirected/lw_graph.hpp"
+#include "graph/common/lw_grid.hpp"
 
 namespace util {
     typedef std::pair<double, int> PQElement;
@@ -16,8 +16,8 @@ namespace util {
 
     class JumpPointSearchLw {
     public:
-        JumpPointSearchLw(undirected::lwGraph<Vertex2D>& graph, int width, int height) 
-            : grid(graph), width(width), height(height) 
+        JumpPointSearchLw(const common::lwGrid& grid, std::function<bool(int, int)> validator = nullptr) 
+            : grid(grid), width(grid.getWidth()), height(grid.getHeight()), validator(validator) 
         {
         };
 
@@ -71,8 +71,9 @@ namespace util {
         };
 
     private:
-        undirected::lwGraph<Vertex2D> grid;
+        common::lwGrid grid;
         int width, height;
+        std::function<bool(int, int)> validator;
 
         const Vertex2D none {-1, -1};
         const std::vector<Vertex2D> directions {
@@ -100,7 +101,7 @@ namespace util {
 
         bool passable(const Vertex2D& loc) const { 
             if (!inBounds(loc)) return false;
-            return !grid.adj(toIndex(loc)).empty(); 
+            return grid.isPassable(toIndex(loc)); 
         };
 
         bool forced(const Vertex2D& loc, const Vertex2D& parent, const Vertex2D& travelDir) {
@@ -119,6 +120,8 @@ namespace util {
         bool validMove(const Vertex2D& loc, const Vertex2D& dir) {
             const auto nextLoc {loc + dir};
             if (!inBounds(nextLoc) || !passable(nextLoc)) return false;
+
+            if (validator && !validator(toIndex(loc), toIndex(nextLoc))) return false;
 
             if(dir.x != 0 && dir.y != 0){
                 return passable(loc + Vertex2D{dir.x, 0}) || passable(loc + Vertex2D{0, dir.y});
