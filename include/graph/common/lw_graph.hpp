@@ -23,6 +23,11 @@ namespace common {
             adjList.resize(num_vertices);
         };
 
+        void resize(int new_size) {
+            vertices.resize(new_size);
+            adjList.resize(new_size);
+        }
+
         void setVertex(int index, const T& data) {
             if (index >= 0 && index < vertices.size()) {
                 vertices[index] = data;

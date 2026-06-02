@@ -17,9 +17,7 @@ namespace util {
     class JumpPointSearchLw {
     public:
         JumpPointSearchLw(const common::lwGrid& grid, std::function<bool(int, int)> validator = nullptr) 
-            : grid(grid), width(grid.getWidth()), height(grid.getHeight()), validator(validator) 
-        {
-        };
+            : grid(grid), width(grid.getWidth()), height(grid.getHeight()), validator(validator) {};
 
         std::vector<int> find(int startId, int endId, std::function<double(const Vertex2D&, const Vertex2D&)> heuristic) {
             if (startId < 0 || startId >= width * height || endId < 0 || endId >= width * height) return {};
