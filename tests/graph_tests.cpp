@@ -21,6 +21,8 @@
 #include "graph/util/prim.hpp"
 #include "graph/util/postman.hpp"
 #include "graph/util/a_star.hpp"
+#include "graph/util/path_smoothing.hpp"
+#include "graph/util/theta_star.hpp"
 
 int calculateMSTCost(common::Graph* g, const std::vector<common::Edge*>& edges) {
     int total = 0;
@@ -272,6 +274,62 @@ TEST(AStarTest, PathfindingWithHeuristic) {
 
     auto path = util::AStar(g.get(), n1->getId(), n2->getId(), util::heuristics::zeroHeuristic);
     EXPECT_EQ(path.size(), 2) << "A* deve encontrar caminho direto em caso sem obstaculo";
+}
+
+TEST(ThetaStarTest, PathfindingWithLineOfSight) {
+    std::unique_ptr<undirected::Graph> g = std::make_unique<undirected::Graph>();
+    
+    auto n1 = g->newVertex(std::pair<double, double>{0.0, 0.0});
+    auto n2 = g->newVertex(std::pair<double, double>{1.0, 1.0});
+    auto n3 = g->newVertex(std::pair<double, double>{2.0, 0.0});
+
+    g->newEdge(n1, n2, 14); // cost 1.4 approx * 10
+    g->newEdge(n2, n3, 14);
+
+    // Without Line of Sight (or callback returning false), should follow edges
+    auto pathNoLos = util::ThetaStar(g.get(), n1->getId(), n3->getId(), 
+        util::heuristics::euclideanHeuristic2D, 
+        [](common::Node*, common::Node*) { return false; });
+    
+    ASSERT_EQ(pathNoLos.size(), 3);
+    EXPECT_EQ(pathNoLos[0], n1);
+    EXPECT_EQ(pathNoLos[1], n2);
+    EXPECT_EQ(pathNoLos[2], n3);
+
+    // With Line of Sight, should skip n2 and go directly to n3
+    auto pathLos = util::ThetaStar(g.get(), n1->getId(), n3->getId(), 
+        util::heuristics::euclideanHeuristic2D, 
+        [](common::Node*, common::Node*) { return true; });
+    
+    ASSERT_EQ(pathLos.size(), 2);
+    EXPECT_EQ(pathLos[0], n1);
+    EXPECT_EQ(pathLos[1], n3);
+}
+
+TEST(ThetaStarTest, LwThetaStarWithLineOfSight) {
+    undirected::lwGraph<util::Vertex2D> g(3);
+    g.setVertex(0, util::Vertex2D(0.0, 0.0));
+    g.setVertex(1, util::Vertex2D(1.0, 1.0));
+    g.setVertex(2, util::Vertex2D(2.0, 0.0));
+    g.addEdge(0, 1, 1.414);
+    g.addEdge(1, 2, 1.414);
+
+    auto heuristic = [](const util::Vertex2D& a, const util::Vertex2D& b) {
+        return std::sqrt(std::pow(a.x - b.x, 2) + std::pow(a.y - b.y, 2));
+    };
+
+    // Without Line of Sight
+    auto pathNoLos = util::lwThetaStar(g, 0, 2, heuristic, nullptr);
+    ASSERT_EQ(pathNoLos.size(), 3);
+    EXPECT_EQ(pathNoLos[0], 0);
+    EXPECT_EQ(pathNoLos[1], 1);
+    EXPECT_EQ(pathNoLos[2], 2);
+
+    // With Line of Sight
+    auto pathLos = util::lwThetaStar(g, 0, 2, heuristic, [](int, int) { return true; });
+    ASSERT_EQ(pathLos.size(), 2);
+    EXPECT_EQ(pathLos[0], 0);
+    EXPECT_EQ(pathLos[1], 2);
 }
 
 TEST(PostmanTest, ChinesePostmanRoute) {
